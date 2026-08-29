@@ -109,7 +109,11 @@ O passo a passo das duas importações (extrato CSV e backup JSON) está em [`do
 
 ## Demo e deploy
 
-O app é 100% estático: o build gera `dist/` e qualquer host de site estático serve. Como o roteamento é no cliente (React Router), o host precisa devolver `index.html` para qualquer rota — o `public/_redirects` (Netlify, Cloudflare Pages), o `netlify.toml` e o `vercel.json` já fazem isso.
+O app é 100% estático: o build gera `dist/` e qualquer host de site estático serve. Como o roteamento é no cliente (React Router), o host precisa devolver `index.html` para qualquer rota — cada plataforma tem seu arquivo de config no repo:
+
+- **Cloudflare** (Workers/Pages): `wrangler.jsonc` — `assets.not_found_handling: "single-page-application"`.
+- **Netlify**: `netlify.toml` — `[[redirects]]` de `/*` para `/index.html`.
+- **Vercel**: `vercel.json` — `rewrites` de `/(.*)` para `/index.html`.
 
 ### Versão demo
 
@@ -122,8 +126,11 @@ Deploy em um clique (Netlify / Cloudflare Pages / Vercel):
 | Campo | Valor |
 |---|---|
 | Build command | `npm run build:demo` |
-| Publish directory | `dist` |
-| Node version | 20 |
+| Publish directory / output | `dist` |
+| Deploy command (só no fluxo Cloudflare Workers Builds) | `npx wrangler deploy` |
+| Node version | 20 (`.nvmrc`) |
+
+No Cloudflare Pages clássico não há deploy command — ele publica o `dist/` sozinho. No fluxo mais novo (Workers Builds) o deploy command é `npx wrangler deploy`, que lê o `wrangler.jsonc`.
 
 O build normal (`npm run build`) **não** carrega dados fictícios — abre no estado vazio, com as 8 categorias e 3 contas padrão.
 
