@@ -1,0 +1,10 @@
+# Deploy da versão demo (dados fictícios). Ver README → "Demo e deploy".
+[build]
+  command = "npm run build:demo"
+  publish = "dist"
+
+# Fallback de SPA também em netlify.toml, além de public/_redirects.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

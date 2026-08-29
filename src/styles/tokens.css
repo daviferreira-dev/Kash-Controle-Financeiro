@@ -1,0 +1,152 @@
+/**
+ * Design system "Premium Editorial Finance".
+ *
+ * Os valores vêm do designMd do projeto Stitch 17495499553694175600, para que
+ * mockup e código compartilhem a mesma fonte de verdade. Definidos como custom
+ * properties: o tema escuro troca apenas este bloco (decisão R-007).
+ */
+:root {
+  color-scheme: light;
+
+  /* Superfícies — papel */
+  --color-surface: #fcf9f0;
+  --color-surface-dim: #dddad1;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f6f3ea;
+  --color-surface-container: #f1eee5;
+  --color-surface-container-high: #ebe8df;
+  --color-surface-container-highest: #e5e2da;
+
+  /* Tinta */
+  --color-on-surface: #1c1c17;
+  --color-on-surface-variant: #56423e;
+
+  /* Ação */
+  --color-primary: #a03f2d;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #e8755f;
+  --color-on-primary-container: #601004;
+
+  --color-secondary: #5f5e5e;
+  --color-tertiary: #705c1e;
+  --color-tertiary-container: #c3a963;
+
+  /* Traços */
+  --color-outline: #8a726d;
+  --color-outline-variant: #ddc0bb;
+
+  /* Erro */
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+
+  /**
+   * Cores semânticas financeiras.
+   * A cor nunca é o único sinal: valores levam sinal explícito (+/−) e os
+   * orçamentos levam rótulo textual (FR-007, FR-016, SC-007).
+   */
+  --color-income: #2f6b4f;
+  --color-income-container: #d9ece1;
+  --color-expense: #a03f2d;
+  --color-expense-container: #f7ddd7;
+  --color-warning: #8a6300;
+  --color-warning-container: #fdefcd;
+
+  /* Cores com alfa embutido — ver a nota no tailwind.config.ts */
+  --color-scrim: rgba(28, 28, 23, 0.32);
+  --color-placeholder: rgba(86, 66, 62, 0.55);
+}
+
+/**
+ * Tema escuro — "tinta".
+ *
+ * Não é a inversão mecânica do claro: o papel marfim vira um carvão quente, e
+ * o coral escurecido do claro precisa clarear aqui para manter contraste. Os
+ * nomes dos tokens são os mesmos, então nenhum componente muda.
+ */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --color-surface: #171613;
+  --color-surface-dim: #100f0d;
+  --color-surface-container-lowest: #1c1b18;
+  --color-surface-container-low: #201e1b;
+  --color-surface-container: #26241f;
+  --color-surface-container-high: #302d28;
+  --color-surface-container-highest: #3a3630;
+
+  --color-on-surface: #f0ebe1;
+  --color-on-surface-variant: #cbbcb2;
+
+  --color-primary: #ffb4a0;
+  --color-on-primary: #55160a;
+  --color-primary-container: #7d2c1c;
+  --color-on-primary-container: #ffdad3;
+
+  --color-secondary: #c9c6c4;
+  --color-tertiary: #e5cb8a;
+  --color-tertiary-container: #4a3d1c;
+
+  --color-outline: #a4948b;
+  --color-outline-variant: #4b433d;
+
+  --color-error: #ffb4ab;
+  --color-on-error: #690005;
+  --color-error-container: #7a1a17;
+  --color-on-error-container: #ffdad6;
+
+  --color-income: #74d6a4;
+  --color-income-container: #1d4033;
+  --color-expense: #ffb4a0;
+  --color-expense-container: #4a231a;
+  --color-warning: #e8c67f;
+  --color-warning-container: #453718;
+
+  --color-scrim: rgba(0, 0, 0, 0.6);
+  --color-placeholder: rgba(203, 188, 178, 0.55);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background-color: var(--color-surface);
+  color: var(--color-on-surface);
+  font-family: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  /* A troca de tema não deve ser um estalo. */
+  transition:
+    background-color 220ms ease,
+    color 220ms ease;
+}
+
+/* Números financeiros alinhados em coluna, como numa tabela impressa. */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Foco visível e consistente em todo alvo interativo (acessibilidade AA). */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/**
+ * Quem pediu menos movimento recebe menos movimento — inclusive nas animações
+ * do Framer Motion, que respeitam esta mesma preferência via useReducedMotion.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

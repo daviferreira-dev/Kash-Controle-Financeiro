@@ -1,0 +1,206 @@
+{
+  "schemaVersion": 1,
+  "transactions": [
+    {
+      "id": "70a7b1fc-b3c2-47da-bddf-36b60044a38f",
+      "type": "income",
+      "amountCents": 500000,
+      "description": "Salário",
+      "date": "2026-08-05",
+      "categoryId": "7a4142df-197d-4d2f-a4d2-65722634ecd4",
+      "accountId": "491044e3-0771-4961-a524-66b08400a7c4",
+      "notes": null,
+      "source": "manual",
+      "sourceRecurrenceId": null,
+      "occurrenceDate": null,
+      "createdAt": "2026-08-29T12:00:00.000Z",
+      "updatedAt": "2026-08-29T12:00:00.000Z"
+    },
+    {
+      "id": "afb09869-a057-4fd6-8ddc-d8f8d908e01e",
+      "type": "expense",
+      "amountCents": 150000,
+      "description": "Aluguel",
+      "date": "2026-08-10",
+      "categoryId": "a23cc160-6ac4-4034-9ce1-a953484c6bd6",
+      "accountId": "491044e3-0771-4961-a524-66b08400a7c4",
+      "notes": "Vencimento todo dia 10",
+      "source": "manual",
+      "sourceRecurrenceId": null,
+      "occurrenceDate": null,
+      "createdAt": "2026-08-29T12:00:00.000Z",
+      "updatedAt": "2026-08-29T12:00:00.000Z"
+    },
+    {
+      "id": "02eb5543-1601-40a9-b717-023d4f8dab96",
+      "type": "expense",
+      "amountCents": 4290,
+      "description": "Almoço no restaurante",
+      "date": "2026-08-29",
+      "categoryId": "4ef171ec-e0bc-4631-b4c0-def032020518",
+      "accountId": "148f14ba-b5c9-4f44-b061-cdf42b3862b3",
+      "notes": null,
+      "source": "manual",
+      "sourceRecurrenceId": null,
+      "occurrenceDate": null,
+      "createdAt": "2026-08-29T12:00:00.000Z",
+      "updatedAt": "2026-08-29T12:00:00.000Z"
+    },
+    {
+      "id": "4dff611c-1c39-4130-a77d-246f247c0e99",
+      "type": "expense",
+      "amountCents": 2500,
+      "description": "Uber para o trabalho",
+      "date": "2026-08-20",
+      "categoryId": "21ed9032-f0e4-4660-bc06-409d84ef644e",
+      "accountId": "148f14ba-b5c9-4f44-b061-cdf42b3862b3",
+      "notes": null,
+      "source": "manual",
+      "sourceRecurrenceId": null,
+      "occurrenceDate": null,
+      "createdAt": "2026-08-29T12:00:00.000Z",
+      "updatedAt": "2026-08-29T12:00:00.000Z"
+    },
+    {
+      "id": "5181dd5a-e26a-4958-b16a-9464bf7edd36",
+      "type": "expense",
+      "amountCents": 3990,
+      "description": "Assinatura de streaming",
+      "date": "2026-08-15",
+      "categoryId": "21927d8e-fdb5-431a-a063-3ee4963fa7f0",
+      "accountId": "148f14ba-b5c9-4f44-b061-cdf42b3862b3",
+      "notes": null,
+      "source": "manual",
+      "sourceRecurrenceId": null,
+      "occurrenceDate": null,
+      "createdAt": "2026-08-29T12:00:00.000Z",
+      "updatedAt": "2026-08-29T12:00:00.000Z"
+    }
+  ],
+  "categories": [
+    {
+      "id": "4ef171ec-e0bc-4631-b4c0-def032020518",
+      "name": "Alimentação",
+      "icon": "utensils",
+      "color": "#a03f2d",
+      "kind": "expense",
+      "archived": false,
+      "isDefault": true
+    },
+    {
+      "id": "21ed9032-f0e4-4660-bc06-409d84ef644e",
+      "name": "Transporte",
+      "icon": "car",
+      "color": "#705c1e",
+      "kind": "expense",
+      "archived": false,
+      "isDefault": true
+    },
+    {
+      "id": "a23cc160-6ac4-4034-9ce1-a953484c6bd6",
+      "name": "Moradia",
+      "icon": "home",
+      "color": "#56423e",
+      "kind": "expense",
+      "archived": false,
+      "isDefault": true
+    },
+    {
+      "id": "e53525b7-9771-490a-8e7b-323e93b4f1b5",
+      "name": "Lazer",
+      "icon": "sparkles",
+      "color": "#c3a963",
+      "kind": "expense",
+      "archived": false,
+      "isDefault": true
+    },
+    {
+      "id": "2d4d60a6-ab1b-48f4-b69f-0446e1828197",
+      "name": "Saúde",
+      "icon": "heart",
+      "color": "#8a726d",
+      "kind": "expense",
+      "archived": false,
+      "isDefault": true
+    },
+    {
+      "id": "b22edd6b-b9d2-418a-986f-811c6c323f7b",
+      "name": "Educação",
+      "icon": "book",
+      "color": "#2f6b4f",
+      "kind": "expense",
+      "archived": false,
+      "isDefault": true
+    },
+    {
+      "id": "21927d8e-fdb5-431a-a063-3ee4963fa7f0",
+      "name": "Assinaturas",
+      "icon": "repeat",
+      "color": "#e8755f",
+      "kind": "expense",
+      "archived": false,
+      "isDefault": true
+    },
+    {
+      "id": "7a4142df-197d-4d2f-a4d2-65722634ecd4",
+      "name": "Outros",
+      "icon": "tag",
+      "color": "#5f5e5e",
+      "kind": "both",
+      "archived": false,
+      "isDefault": true
+    }
+  ],
+  "accounts": [
+    {
+      "id": "148f14ba-b5c9-4f44-b061-cdf42b3862b3",
+      "name": "Nubank",
+      "initialBalanceCents": 0,
+      "archived": false,
+      "isDefault": true
+    },
+    {
+      "id": "491044e3-0771-4961-a524-66b08400a7c4",
+      "name": "Itaú",
+      "initialBalanceCents": 0,
+      "archived": false,
+      "isDefault": true
+    },
+    {
+      "id": "637763f0-44ac-45a7-8af7-f00500626cf8",
+      "name": "Carteira",
+      "initialBalanceCents": 0,
+      "archived": false,
+      "isDefault": true
+    }
+  ],
+  "budgets": [
+    {
+      "id": "bf23182c-d018-4410-9623-b2aaf5f2b98b",
+      "categoryId": "4ef171ec-e0bc-4631-b4c0-def032020518",
+      "limitCents": 80000,
+      "startMonth": "2026-08",
+      "createdAt": "2026-08-29T12:00:00.000Z",
+      "updatedAt": "2026-08-29T12:00:00.000Z"
+    }
+  ],
+  "recurrences": [
+    {
+      "id": "92b0dd0e-bcd1-4329-a88e-6c20511b5d72",
+      "type": "expense",
+      "amountCents": 150000,
+      "description": "Aluguel",
+      "categoryId": "a23cc160-6ac4-4034-9ce1-a953484c6bd6",
+      "accountId": "491044e3-0771-4961-a524-66b08400a7c4",
+      "notes": null,
+      "frequency": "monthly",
+      "startDate": "2026-08-10",
+      "endDate": null,
+      "status": "active",
+      "lastGeneratedDate": "2026-08-10",
+      "createdAt": "2026-08-29T12:00:00.000Z",
+      "updatedAt": "2026-08-29T12:00:00.000Z"
+    }
+  ],
+  "exportedAt": "2026-08-29T12:00:00.000Z"
+}
