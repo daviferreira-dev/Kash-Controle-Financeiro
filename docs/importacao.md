@@ -24,13 +24,17 @@ O arquivo precisa ter um cabeçalho com, no mínimo, as colunas **Data**, **Valo
 
 O **sinal do valor define o tipo**: negativo vira despesa, positivo vira receita.
 
-[`fixtures/exemplo-extrato-nubank.csv`](../fixtures/exemplo-extrato-nubank.csv) mostra o formato, com dados fictícios.
+[`fixtures/exemplo-extrato-nubank.csv`](../fixtures/exemplo-extrato-nubank.csv) mostra o formato mínimo, e [`fixtures/exemplo-extrato-3meses.csv`](../fixtures/exemplo-extrato-3meses.csv) traz três meses fictícios (bom para testar a detecção de recorrências e as sugestões de orçamento).
 
 ### Atualizando o extrato toda semana
 
 Se você exporta o mês inteiro até a data corrente, cada arquivo repete tudo que já veio antes. Use sempre **Adicionar** (o padrão): o Kash pula o que já existe, comparando pelo campo `Identificador`. Reimportar o mesmo arquivo por engano não cria nada nem altera o saldo.
 
 **Não use "Substituir tudo" nessa rotina.** Ele apaga *todos* os lançamentos, incluindo os que você digitou à mão, os de outras contas e os gerados por recorrências. Ele serve só para o primeiro carregamento ou para recomeçar do zero.
+
+### Classificar o que sobrou
+
+Cada lançamento entra com uma categoria sugerida pela descrição. O que o Kash não reconhece cai em *Outros* e aparece logo depois da importação, numa lista curta: você escolhe a categoria de cada um e clica em **Aplicar e memorizar**. O Kash guarda o par "estabelecimento → categoria" neste navegador, então da próxima vez esse mesmo lugar já vem classificado sozinho. Esse aprendizado não entra no backup: é uma preferência de máquina, como o tema.
 
 ### Detecção automática de recorrências
 
@@ -56,6 +60,8 @@ O botão **Importar dados** restaura o arquivo gerado por *Exportar dados*.
 
 - O formato aceito é o **JSON do próprio Kash**.
 - A importação **substitui integralmente** a base atual, não soma lançamentos. Por isso o app pede confirmação explícita antes.
+
+Para levar os dados para fora do Kash, **Ajustes → Exportar planilha** gera um CSV dos lançamentos (Data, Mês, Tipo, Categoria, Conta, Descrição, Valor, Saldo acumulado, Observações) pronto para abrir no Excel ou no Google Sheets. Esse CSV é só leitura: o Kash não reimporta ele de volta, só o JSON.
 
 ## O modelo
 

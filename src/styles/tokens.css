@@ -113,6 +113,13 @@ body,
   height: 100%;
 }
 
+/* A casca do app tem altura fixa e cuida da própria rolagem: nada de barra
+   na janela. */
+html,
+body {
+  overflow: hidden;
+}
+
 body {
   background-color: var(--color-surface);
   color: var(--color-on-surface);

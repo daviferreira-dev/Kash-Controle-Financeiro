@@ -85,7 +85,7 @@ export interface KashDatabase {
   budgets: BudgetRepository;
   recurrences: RecurrenceRepository;
 
-  /** Cria as 8 categorias e 3 contas padrão numa base vazia (FR-026). */
+  /** Cria as 9 categorias e 3 contas padrão numa base vazia (FR-026). */
   seedIfEmpty(): Promise<void>;
   exportAll(): Promise<KashSnapshot>;
   /** Valida antes de substituir; nunca sobrescreve quando ok === false (FR-030). */

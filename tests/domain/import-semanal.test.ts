@@ -163,7 +163,7 @@ describe('atualização semanal com extratos sobrepostos', () => {
     await db.budgets.upsertForCategory(categories[0]!.id, 80000, '2026-08');
     await importarSubstituindo(SEMANA_2);
 
-    expect(await db.categories.list()).toHaveLength(8);
+    expect(await db.categories.list()).toHaveLength(9);
     expect(await db.accounts.list()).toHaveLength(3);
     expect(await db.budgets.list()).toHaveLength(1);
   });

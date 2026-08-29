@@ -11,6 +11,7 @@ export const DEFAULT_CATEGORIES: NewCategory[] = [
   { name: 'Alimentação', icon: 'utensils', color: '#a03f2d', kind: 'expense', archived: false, isDefault: true },
   { name: 'Transporte', icon: 'car', color: '#705c1e', kind: 'expense', archived: false, isDefault: true },
   { name: 'Moradia', icon: 'home', color: '#56423e', kind: 'expense', archived: false, isDefault: true },
+  { name: 'Contas de casa', icon: 'plug', color: '#4f6d73', kind: 'expense', archived: false, isDefault: true },
   { name: 'Lazer', icon: 'sparkles', color: '#c3a963', kind: 'expense', archived: false, isDefault: true },
   { name: 'Saúde', icon: 'heart', color: '#8a726d', kind: 'expense', archived: false, isDefault: true },
   { name: 'Educação', icon: 'book', color: '#2f6b4f', kind: 'expense', archived: false, isDefault: true },

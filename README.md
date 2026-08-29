@@ -10,19 +10,19 @@ O fluxo pensado para rodar toda semana:
 
 1. No app do banco, exporte o extrato do período em **CSV** (no Nubank: *Conta → Histórico → exportar → CSV*).
 2. No Kash, vá em **Ajustes → Importar extrato (CSV)** e escolha o arquivo. No modo **Adicionar** (o padrão), ele cria só os lançamentos novos e pula os que já existem, comparando pelo identificador do banco. Reimportar o mesmo arquivo não duplica nada nem mexe no saldo.
-3. Cada lançamento já vem com uma **categoria sugerida** pela descrição; você ajusta o que quiser na lista de Transações.
+3. Cada lançamento vem com uma **categoria sugerida** pela descrição. O que ele não reconhece aparece numa lista logo após a importação para você classificar; ele **memoriza** o estabelecimento e da próxima vez já acerta sozinho.
 4. Depois de cada importação, o Kash varre **todo o histórico** e aponta os padrões que se repetem (aluguel, assinaturas, salário). Um clique transforma cada um em recorrência.
 5. O **PDF** do extrato **não é lido pelo app**: o parsing de PDF de banco é frágil demais e o risco de importar um valor errado é inaceitável (detalhes em [`docs/importacao.md`](docs/importacao.md)). O PDF serve só para você conferir o saldo final e informá-lo em **Ajustes → Saldo das contas**, já que o CSV não traz saldo nem rendimento da conta.
 
 ## O que ele faz
 
-- **Importação de extrato (CSV)**: lê data, valor e descrição de cada linha do extrato do Nubank (e formatos equivalentes), cria os lançamentos e sugere a categoria pela descrição. De-duplicação exata pelo identificador do banco. O parser é tolerante na entrada e rígido na saída: uma linha que não vira transação válida é reportada, nunca adivinhada.
+- **Importação de extrato (CSV)**: lê data, valor e descrição de cada linha do extrato do Nubank (e formatos equivalentes), cria os lançamentos e sugere a categoria pela descrição. O que não reconhece vai para uma revisão rápida logo após a importação, e o Kash memoriza a escolha por estabelecimento para as próximas vezes. De-duplicação exata pelo identificador do banco. O parser é tolerante na entrada e rígido na saída: uma linha que não vira transação válida é reportada, nunca adivinhada.
 - **Detecção automática de recorrências**: depois de cada importação, encontra no histórico os lançamentos que se repetem com regularidade (mesmo destinatário, intervalo fixo, valor próximo), mesmo quando a descrição muda entre os meses, e propõe transformá-los em contas fixas.
 - **Recorrências**: contas fixas que viram lançamentos automaticamente nas datas certas quando você abre o app, sem duplicar.
 - **Visão geral**: saldo acumulado, entradas e saídas do mês, distribuição das despesas por categoria (donut), tendência dos últimos meses (linha), insights gerados a partir dos números e lançamentos recentes.
 - **Orçamentos**: teto mensal por categoria, com acompanhamento do consumo e alerta em três faixas (dentro do limite, atenção a partir de 80%, estourado). Sugestões de teto calculadas a partir do histórico, com projeção do mês corrente.
 - **Transações**: além da importação, dá para lançar à mão. Filtros por mês, tipo, categoria, conta e busca textual; lista agrupada por dia com subtotal; desfazer ao excluir.
-- **Ajustes**: saldo das contas, exportar e importar backup em JSON, gerenciar categorias e contas.
+- **Ajustes**: saldo das contas, backup em JSON, exportar os lançamentos como planilha (CSV para Excel/Sheets), gerenciar categorias e contas.
 
 ## Stack
 
@@ -39,7 +39,7 @@ npm install
 npm run dev
 ```
 
-Abre em `http://localhost:5173`. A porta é fixa de propósito: o `localStorage` é isolado por origem, então deixar o Vite escolher a porta esconderia os dados já salvos. Na primeira execução o app cria as 8 categorias e as 3 contas padrão.
+Abre em `http://localhost:5173`. A porta é fixa de propósito: o `localStorage` é isolado por origem, então deixar o Vite escolher a porta esconderia os dados já salvos. Na primeira execução o app cria as 9 categorias e as 3 contas padrão.
 
 ### Atalho na área de trabalho (Windows)
 
@@ -143,7 +143,7 @@ Deploy em um clique (Netlify, Cloudflare Pages ou Vercel):
 
 No Cloudflare Pages clássico não existe deploy command: ele publica o `dist/` sozinho. No fluxo mais novo (Workers Builds), o deploy command é `npx wrangler deploy`, que lê o `wrangler.jsonc`.
 
-O build normal (`npm run build`) **não** carrega dados fictícios. Abre no estado vazio, com as 8 categorias e 3 contas padrão.
+O build normal (`npm run build`) **não** carrega dados fictícios. Abre no estado vazio, com as 9 categorias e 3 contas padrão.
 
 ## Fora do escopo desta versão
 

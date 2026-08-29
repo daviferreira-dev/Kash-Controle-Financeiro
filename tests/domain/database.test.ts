@@ -28,18 +28,19 @@ beforeEach(() => {
 });
 
 describe('seedIfEmpty (FR-026)', () => {
-  it('cria as 8 categorias e as 3 contas padrão', async () => {
+  it('cria as 9 categorias e as 3 contas padrão', async () => {
     await db.seedIfEmpty();
 
     const categories = await db.categories.list();
     const accounts = await db.accounts.list();
 
-    expect(categories).toHaveLength(8);
+    expect(categories).toHaveLength(9);
     expect(accounts).toHaveLength(3);
     expect(categories.map((c) => c.name)).toEqual([
       'Alimentação',
       'Transporte',
       'Moradia',
+      'Contas de casa',
       'Lazer',
       'Saúde',
       'Educação',
@@ -54,7 +55,7 @@ describe('seedIfEmpty (FR-026)', () => {
     await db.seedIfEmpty();
     await db.seedIfEmpty();
 
-    expect(await db.categories.list()).toHaveLength(8);
+    expect(await db.categories.list()).toHaveLength(9);
     expect(await db.accounts.list()).toHaveLength(3);
   });
 
@@ -66,10 +67,10 @@ describe('seedIfEmpty (FR-026)', () => {
     const categories = await db.categories.list();
     const accounts = await db.accounts.list();
 
-    expect(categories).toHaveLength(8);
+    expect(categories).toHaveLength(9);
     expect(accounts).toHaveLength(3);
     // E cada nome aparece uma única vez.
-    expect(new Set(categories.map((c) => c.name)).size).toBe(8);
+    expect(new Set(categories.map((c) => c.name)).size).toBe(9);
     expect(new Set(accounts.map((a) => a.name)).size).toBe(3);
   });
 
@@ -77,7 +78,7 @@ describe('seedIfEmpty (FR-026)', () => {
     const other = new LocalKashDatabase();
     await Promise.all([db.seedIfEmpty(), other.seedIfEmpty()]);
 
-    expect(await db.categories.list()).toHaveLength(8);
+    expect(await db.categories.list()).toHaveLength(9);
   });
 });
 
@@ -225,8 +226,8 @@ describe('integridade de categorias e contas (FR-027)', () => {
 
     await db.categories.archive(first!.id);
 
-    expect(await db.categories.list()).toHaveLength(8);
-    expect(await db.categories.listActive()).toHaveLength(7);
+    expect(await db.categories.list()).toHaveLength(9);
+    expect(await db.categories.listActive()).toHaveLength(8);
   });
 
   it('impede excluir conta em uso', async () => {
@@ -251,7 +252,7 @@ describe('export e import (FR-030)', () => {
 
     expect(snapshot.schemaVersion).toBe(SCHEMA_VERSION);
     expect(snapshot.transactions).toHaveLength(1);
-    expect(snapshot.categories).toHaveLength(8);
+    expect(snapshot.categories).toHaveLength(9);
     expect(snapshot.exportedAt).toBeTruthy();
   });
 
@@ -266,7 +267,7 @@ describe('export e import (FR-030)', () => {
 
     expect(result.ok).toBe(true);
     expect(result.counts.transactions).toBe(1);
-    expect(await restored.categories.list()).toHaveLength(8);
+    expect(await restored.categories.list()).toHaveLength(9);
   });
 
   it('rejeita arquivo inválido SEM sobrescrever a base existente', async () => {
@@ -279,7 +280,7 @@ describe('export e import (FR-030)', () => {
     expect(result.errors.length).toBeGreaterThan(0);
     // A base continua intacta — é o ponto do requisito.
     expect(await db.transactions.list()).toHaveLength(1);
-    expect(await db.categories.list()).toHaveLength(8);
+    expect(await db.categories.list()).toHaveLength(9);
   });
 
   it('rejeita conteúdo que nem é objeto', async () => {

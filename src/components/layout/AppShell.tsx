@@ -1,7 +1,9 @@
-import { useState } from 'react';
-import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { useKash } from '@/state/hooks';
+import { useKash, useMoney } from '@/state/hooks';
+import { computeBudgetProgress, isBudgetActiveIn } from '@/domain/budget';
+import { currentMonth } from '@/lib/date';
 import { cx } from '@/components/ui';
 import logoLight from '@/assets/brand/logo-light.png';
 import logoDark from '@/assets/brand/logo-dark.png';
@@ -191,6 +193,118 @@ function ThemeToggle() {
   );
 }
 
+/**
+ * Sino de atenção na barra superior. Só aparece quando algum orçamento do mês
+ * corrente está em atenção ou estourado; some quando está tudo dentro do limite.
+ * Olha sempre o mês de hoje, não o mês que a pessoa está navegando.
+ */
+function BudgetAlert() {
+  const { budgets, categories, transactions, setMonth } = useKash();
+  const money = useMoney();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const mes = currentMonth();
+
+  const alertas = budgets
+    .filter((b) => isBudgetActiveIn(b, mes))
+    .map((b) =>
+      computeBudgetProgress(b, categories.find((c) => c.id === b.categoryId), transactions, mes),
+    )
+    .filter((p) => p.status !== 'ok')
+    .sort((a, b) => b.percentUsed - a.percentUsed);
+
+  useEffect(() => {
+    if (!open) return;
+    function onDown(e: MouseEvent) {
+      if (!ref.current?.contains(e.target as Node)) setOpen(false);
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') setOpen(false);
+    }
+    document.addEventListener('mousedown', onDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
+  if (alertas.length === 0) return null;
+
+  const temEstourado = alertas.some((a) => a.status === 'exceeded');
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        aria-haspopup="dialog"
+        aria-label={`${alertas.length} orçamento${alertas.length > 1 ? 's' : ''} pedindo atenção`}
+        className={cx(
+          'inline-flex h-11 w-11 items-center justify-center rounded-full border border-outline-variant transition hover:bg-surface-container',
+          temEstourado ? 'text-error' : 'text-warning',
+        )}
+      >
+        <svg {...ICON_PROPS}>
+          <path d="M10.3 3.3a2 2 0 0 1 3.4 0l8.4 14.2A2 2 0 0 1 20.4 20.5H3.6a2 2 0 0 1-1.7-3z" />
+          <path d="M12 9.5v4" />
+          <path d="M12 17h.01" />
+        </svg>
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            role="dialog"
+            aria-label="Orçamentos pedindo atenção"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.16, ease: [0.2, 0.8, 0.2, 1] }}
+            className="absolute right-0 top-full z-50 mt-2 w-[min(20rem,calc(100vw-2rem))] rounded-lg border border-outline-variant bg-surface-container-lowest p-2 shadow-ambient"
+          >
+            <p className="px-2 pb-1 pt-1 font-label text-label-caps uppercase text-on-surface-variant">
+              Pedindo atenção neste mês
+            </p>
+            <ul className="flex flex-col">
+              {alertas.map((a) => (
+                <li key={a.budget.id}>
+                  <Link
+                    to="/orcamentos"
+                    onClick={() => {
+                      setMonth(mes);
+                      setOpen(false);
+                    }}
+                    className="flex items-center justify-between gap-3 rounded px-2 py-2 text-sm hover:bg-surface-container"
+                  >
+                    <span className="min-w-0">
+                      <span className="block truncate text-on-surface">
+                        {a.category?.name ?? 'Categoria'}
+                      </span>
+                      <span className="text-xs text-on-surface-variant">
+                        {money.format(a.spentCents)} de {money.format(a.budget.limitCents)}
+                      </span>
+                    </span>
+                    <span
+                      className={cx(
+                        'shrink-0 text-xs font-semibold',
+                        a.status === 'exceeded' ? 'text-error' : 'text-warning',
+                      )}
+                    >
+                      {a.statusLabel}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 function Logo() {
   return (
     <div className="flex flex-col gap-1">
@@ -334,16 +448,23 @@ function PageTransition({ routeKey, children }: { routeKey: string; children: Re
 export function AppShell() {
   const { loading } = useKash();
   const location = useLocation();
+  const mainRef = useRef<HTMLElement>(null);
+
+  // Só o conteúdo rola; o menu e a barra superior ficam fixos. Ao trocar de
+  // rota, devolve o scroll ao topo (senão a página nova abre no meio).
+  useEffect(() => {
+    if (mainRef.current) mainRef.current.scrollTop = 0;
+  }, [location.pathname]);
 
   return (
-    <div className="flex min-h-full flex-col bg-surface">
+    <div className="flex h-dvh flex-col overflow-hidden bg-surface">
       <DemoBanner />
       <StorageWarning />
       <GeneratedNotice />
 
-      <div className="flex flex-1 flex-col md:flex-row">
+      <div className="flex min-h-0 flex-1 flex-col md:flex-row">
         {/* Sidebar a partir de md */}
-        <aside className="hidden w-60 shrink-0 border-r border-outline-variant bg-surface-container-low p-5 md:flex md:flex-col">
+        <aside className="hidden w-60 shrink-0 overflow-hidden border-r border-outline-variant bg-surface-container-low p-5 md:flex md:flex-col">
           <div className="mb-5">
             <Logo />
           </div>
@@ -359,18 +480,23 @@ export function AppShell() {
           </p>
         </aside>
 
-        <div className="flex flex-1 flex-col">
-          {/* No mobile o tema fica no topo; no desktop, no rodapé da sidebar */}
-          {/* Barra fina presente em todas as telas: o tema fica sempre a um clique */}
-          <header className="flex items-center justify-between gap-3 border-b border-outline-variant px-[max(1.25rem,env(safe-area-inset-left))] py-2.5 md:px-8 lg:px-16">
+        <div className="flex min-h-0 flex-1 flex-col">
+          {/* Barra superior fixa: logo (no mobile), atenção de orçamento e tema */}
+          <header className="flex shrink-0 items-center justify-between gap-3 border-b border-outline-variant px-[max(1.25rem,env(safe-area-inset-left))] py-2.5 md:px-8 lg:px-16">
             <span className="contents md:hidden">
               <BrandLogo className="h-auto w-[92px]" />
             </span>
             <span className="hidden md:block" />
-            <ThemeToggle />
+            <div className="flex items-center gap-2">
+              <BudgetAlert />
+              <ThemeToggle />
+            </div>
           </header>
 
-          <main className="flex-1 px-5 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-5 md:px-8 md:pb-8 lg:px-16">
+          <main
+            ref={mainRef}
+            className="sem-barra flex-1 overflow-y-auto px-5 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-5 md:px-8 md:pb-8 lg:px-16"
+          >
             {loading ? (
               <p className="py-16 text-center text-sm text-on-surface-variant">Carregando…</p>
             ) : (

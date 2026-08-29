@@ -1,11 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import {
   dedupeKey,
+  merchantKey,
   parseStatementAmount,
   parseStatementCsv,
   parseStatementDate,
   splitCsvLine,
   statementRowsToTransactions,
+  suggestCategory,
   suggestCategoryId,
 } from '@/domain/csvImport';
 import { validateTransaction } from '@/domain/validation';
@@ -15,6 +17,7 @@ const categories: Category[] = [
   ['Alimentação', '#a03f2d'],
   ['Transporte', '#705c1e'],
   ['Moradia', '#56423e'],
+  ['Contas de casa', '#4f6d73'],
   ['Lazer', '#c3a963'],
   ['Saúde', '#8a726d'],
   ['Educação', '#2f6b4f'],
@@ -227,11 +230,54 @@ describe('suggestCategoryId', () => {
 
   it('reconhece moradia e saúde', () => {
     expect(nameOf(suggestCategoryId('Pagamento de aluguel', categories))).toBe('Moradia');
+    expect(nameOf(suggestCategoryId('Boleto - CONDOMINIO EDIFICIO CENTRAL', categories))).toBe('Moradia');
     expect(nameOf(suggestCategoryId('DROGARIA SAO PAULO', categories))).toBe('Saúde');
+  });
+
+  it('separa contas de consumo (luz, água, gás, internet) de Moradia', () => {
+    const é = (desc: string) => nameOf(suggestCategoryId(desc, categories));
+    expect(é('Pagamento de boleto efetuado - EDP SAO PAULO')).toBe('Contas de casa');
+    expect(é('Pagamento de boleto efetuado - ENEL DISTRIBUICAO SP')).toBe('Contas de casa');
+    expect(é('Pagamento de boleto efetuado - CEMIG')).toBe('Contas de casa');
+    expect(é('Pagamento de boleto efetuado - SABESP')).toBe('Contas de casa');
+    expect(é('Pagamento de boleto efetuado - COMGAS')).toBe('Contas de casa');
+    expect(é('Compra no débito - VIVO FIBRA')).toBe('Contas de casa');
+    // aluguel continua em Moradia
+    expect(é('Pagamento de boleto efetuado - IMOBILIARIA DANELLI')).toBe('Moradia');
   });
 
   it('cai em Outros quando não reconhece — não chuta', () => {
     expect(nameOf(suggestCategoryId('TRANSFERENCIA FULANO DE TAL', categories))).toBe('Outros');
+  });
+});
+
+describe('merchantKey', () => {
+  it('extrai o estabelecimento depois do " - " e normaliza', () => {
+    expect(merchantKey('Compra no débito - NAGUMO')).toBe('nagumo');
+    expect(merchantKey('Transferência enviada pelo Pix - CLINICA ODONTOLOGIA LTDA - Conta: 13004481-6'))
+      .toBe('clinica odontologia ltda');
+  });
+
+  it('junta variações do mesmo lugar na mesma chave', () => {
+    expect(merchantKey('IFOOD *PEDIDO 8213')).toBe('ifood');
+    expect(merchantKey('IFOOD *PEDIDO 9471')).toBe('ifood');
+  });
+});
+
+describe('suggestCategory — aprendizado', () => {
+  const nameOf = (id: string) => categories.find((c) => c.id === id)!.name;
+
+  it('o que foi ensinado vence a regra de palavra-chave e conta como classificado', () => {
+    const lazer = categories.find((c) => c.name === 'Lazer')!;
+    const s = suggestCategory('Compra no débito - NAGUMO', categories, { nagumo: lazer.id });
+    expect(nameOf(s.id)).toBe('Lazer'); // a regra diria Alimentação
+    expect(s.matched).toBe(true);
+  });
+
+  it('sem regra nem aprendizado, marca matched=false', () => {
+    const s = suggestCategory('TRANSFERENCIA FULANO DE TAL', categories);
+    expect(nameOf(s.id)).toBe('Outros');
+    expect(s.matched).toBe(false);
   });
 });
 

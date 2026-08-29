@@ -25,6 +25,7 @@ const CATEGORIES: Category[] = [
   { id: 'demo-cat-alimentacao', name: 'Alimentação', icon: 'utensils', color: '#a03f2d', kind: 'expense', archived: false, isDefault: true },
   { id: 'demo-cat-transporte', name: 'Transporte', icon: 'car', color: '#705c1e', kind: 'expense', archived: false, isDefault: true },
   { id: 'demo-cat-moradia', name: 'Moradia', icon: 'home', color: '#56423e', kind: 'expense', archived: false, isDefault: true },
+  { id: 'demo-cat-contas', name: 'Contas de casa', icon: 'plug', color: '#4f6d73', kind: 'expense', archived: false, isDefault: true },
   { id: 'demo-cat-lazer', name: 'Lazer', icon: 'sparkles', color: '#c3a963', kind: 'expense', archived: false, isDefault: true },
   { id: 'demo-cat-saude', name: 'Saúde', icon: 'heart', color: '#8a726d', kind: 'expense', archived: false, isDefault: true },
   { id: 'demo-cat-educacao', name: 'Educação', icon: 'book', color: '#2f6b4f', kind: 'expense', archived: false, isDefault: true },
@@ -87,6 +88,8 @@ interface RecSpec {
 const MONTHLY_RECURRENCES: RecSpec[] = [
   { type: 'income', description: 'Salário', category: 'Outros', account: 'Itaú', cents: 648000, day: 5, notes: null, status: 'active' },
   { type: 'expense', description: 'Aluguel', category: 'Moradia', account: 'Itaú', cents: 213000, day: 8, notes: 'Vencimento todo dia 8', status: 'active' },
+  { type: 'expense', description: 'Energia (EDP)', category: 'Contas de casa', account: 'Nubank', cents: 18740, day: 12, notes: null, status: 'active' },
+  { type: 'expense', description: 'Internet fibra', category: 'Contas de casa', account: 'Nubank', cents: 9990, day: 18, notes: null, status: 'active' },
   { type: 'expense', description: 'Plano de streaming (família)', category: 'Assinaturas', account: 'Nubank', cents: 5590, day: 15, notes: null, status: 'active' },
 ];
 

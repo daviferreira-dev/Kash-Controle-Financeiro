@@ -3,3 +3,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/**
+ * Rolagem sem o trilho visível. O conteúdo continua deslizando por roda,
+ * toque e teclado; só a barra some. Usado na área de conteúdo de cada módulo.
+ */
+.sem-barra {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge legado */
+}
+.sem-barra::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}

@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { useAccounts, useCategories, useKash } from '@/state/hooks';
 import { IntegrityError } from '@/lib/errors';
 import { formatBRL } from '@/lib/money';
+import { transactionsToCsv } from '@/domain/spreadsheet';
 import { Button, Card, ConfirmDialog, Input, SectionHeader, cx, useToast } from '@/components/ui';
 import { Link } from 'react-router-dom';
 import { AccountBalances } from '@/components/settings/AccountBalances';
@@ -9,7 +10,7 @@ import { AccountBalances } from '@/components/settings/AccountBalances';
 type Feedback = { kind: 'success' | 'error'; message: string } | null;
 
 export function SettingsPage() {
-  const { db, refresh, accounts, categories } = useKash();
+  const { db, refresh, accounts, categories, transactions } = useKash();
   const { archive: archiveCategory, unarchive: unarchiveCategory, remove: removeCategory, create: createCategory } =
     useCategories();
   const { archive: archiveAccount, unarchive: unarchiveAccount, remove: removeAccount, create: createAccount } =
@@ -37,6 +38,30 @@ export function SettingsPage() {
       setFeedback({ kind: 'success', message: 'Backup baixado com sucesso.' });
     } catch {
       setFeedback({ kind: 'error', message: 'Não foi possível gerar o backup.' });
+    }
+  }
+
+  function handleExportSpreadsheet() {
+    if (transactions.length === 0) {
+      setFeedback({ kind: 'error', message: 'Nenhum lançamento para exportar ainda.' });
+      return;
+    }
+    try {
+      const csv = transactionsToCsv(transactions, categories, accounts);
+      // O BOM inicial faz o Excel abrir os acentos corretamente.
+      const bom = String.fromCharCode(0xfeff);
+      const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `kash-lancamentos-${new Date().toISOString().slice(0, 10)}.csv`;
+      link.click();
+      URL.revokeObjectURL(url);
+
+      setFeedback({ kind: 'success', message: 'Planilha baixada. Abra no Excel ou no Google Sheets.' });
+    } catch {
+      setFeedback({ kind: 'error', message: 'Não foi possível gerar a planilha.' });
     }
   }
 
@@ -141,10 +166,15 @@ export function SettingsPage() {
         <Card>
           <p className="text-sm text-on-surface-variant">
             Seus dados ficam apenas neste navegador. Se você limpar os dados do site, trocar de
-            navegador ou de computador, eles não vão junto. Exporte um arquivo para não perder nada.
+            navegador ou de computador, eles não vão junto. <strong>Exportar dados</strong> gera um
+            backup que o próprio Kash lê de volta; <strong>Exportar planilha</strong> gera um CSV
+            dos lançamentos para abrir no Excel ou no Google Sheets.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             <Button onClick={handleExport}>Exportar dados</Button>
+            <Button variant="secondary" onClick={handleExportSpreadsheet}>
+              Exportar planilha
+            </Button>
             <Button variant="secondary" onClick={() => fileInputRef.current?.click()}>
               Importar dados
             </Button>

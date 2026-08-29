@@ -240,7 +240,13 @@ const CATEGORY_HINTS: Array<{ category: string; patterns: RegExp }> = [
   },
   {
     category: 'Moradia',
-    patterns: /aluguel|condominio|imobiliaria|energia|eletropaulo|enel|cpfl|sabesp|agua|gas\b|internet|vivo|claro|tim\b|telefonica|net\b/i,
+    patterns: /aluguel|condominio|condominial|imobiliaria|iptu/i,
+  },
+  {
+    // Contas de consumo da casa: luz, água, gás, internet, telefone.
+    category: 'Contas de casa',
+    patterns:
+      /energia|eletric|\bedp\b|eletropaulo|enel|cpfl|cemig|copel|light\s?serv|coelba|celesc|celpe|cosern|elektro|energisa|equatorial|neoenergia|rge\b|sabesp|cedae|copasa|sanepar|caesb|embasa|agua|saneamento|\bgas\b|comgas|naturgy|internet|banda\s?larga|vivo|claro|\btim\b|telefonica|\bnet\b|gvt|oi\s?fibra/i,
   },
   {
     category: 'Saúde',
@@ -260,28 +266,78 @@ const CATEGORY_HINTS: Array<{ category: string; patterns: RegExp }> = [
   },
 ];
 
+/** Aprendizado de categorização: `merchantKey(descrição)` -> id da categoria. */
+export type LearnedCategories = Record<string, string>;
+
 /**
- * Sugere uma categoria a partir da descrição. Cai em "Outros" quando não
+ * Reduz a descrição do extrato a uma "chave de estabelecimento" estável, para
+ * o aprendizado reconhecer o mesmo lugar mesmo quando o texto varia
+ * ("IFOOD *PEDIDO 8213" e "IFOOD *PEDIDO 9471" viram "ifood").
+ */
+export function merchantKey(description: string): string {
+  let s = description.replace(/\s*-\s*conta:.*$/i, '');
+  const dash = s.indexOf(' - ');
+  if (dash !== -1) s = s.slice(dash + 3);
+  s = s
+    .toLowerCase()
+    .replace(/\*.*$/, ' ')
+    .replace(/\d+/g, ' ')
+    .replace(/[^a-zà-ú ]/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return s.split(' ').filter(Boolean).slice(0, 3).join(' ');
+}
+
+export interface CategorySuggestion {
+  id: string;
+  /** true quando veio de aprendizado ou de uma regra; false quando caiu em "Outros". */
+  matched: boolean;
+}
+
+/**
+ * Sugere uma categoria a partir da descrição. Consulta primeiro o que a pessoa
+ * já ensinou, depois as regras de palavra-chave, e cai em "Outros" quando não
  * reconhece — nunca chuta uma categoria específica sem evidência.
  */
-export function suggestCategoryId(description: string, categories: Category[]): string {
+export function suggestCategory(
+  description: string,
+  categories: Category[],
+  learned: LearnedCategories = {},
+): CategorySuggestion {
   const active = categories.filter((c) => !c.archived);
+  const byId = (id: string) => active.find((c) => c.id === id);
   const byName = (name: string) => active.find((c) => c.name === name);
+
+  const key = merchantKey(description);
+  if (key && learned[key]) {
+    const learnedCategory = byId(learned[key]!);
+    if (learnedCategory) return { id: learnedCategory.id, matched: true };
+  }
 
   for (const hint of CATEGORY_HINTS) {
     if (hint.patterns.test(description)) {
       const match = byName(hint.category);
-      if (match) return match.id;
+      if (match) return { id: match.id, matched: true };
     }
   }
 
-  return (byName('Outros') ?? active[0])?.id ?? '';
+  return { id: (byName('Outros') ?? active[0])?.id ?? '', matched: false };
+}
+
+export function suggestCategoryId(
+  description: string,
+  categories: Category[],
+  learned?: LearnedCategories,
+): string {
+  return suggestCategory(description, categories, learned).id;
 }
 
 export interface ToTransactionsOptions {
   rows: StatementRow[];
   categories: Category[];
   account: Account;
+  /** O que a pessoa já ensinou em importações anteriores. */
+  learned?: LearnedCategories;
 }
 
 /**
@@ -294,13 +350,14 @@ export function statementRowsToTransactions({
   rows,
   categories,
   account,
+  learned,
 }: ToTransactionsOptions): NewTransaction[] {
   return rows.map((row) => ({
     type: row.type,
     amountCents: row.amountCents,
     description: row.description,
     date: row.date,
-    categoryId: suggestCategoryId(row.description, categories),
+    categoryId: suggestCategoryId(row.description, categories, learned),
     accountId: account.id,
     notes: row.externalId ? `Extrato ${account.name} · id ${row.externalId}` : `Extrato ${account.name}`,
     source: 'manual',

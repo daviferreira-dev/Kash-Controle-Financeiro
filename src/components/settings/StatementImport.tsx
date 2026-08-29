@@ -1,14 +1,17 @@
 import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import type { Transaction } from '@/domain/types';
 import { detectRecurrences } from '@/domain/recurrenceDetection';
 import { today } from '@/lib/date';
 import {
   dedupeKey,
   parseStatementCsv,
   statementRowsToTransactions,
+  suggestCategory,
   type ParseError,
   type StatementRow,
 } from '@/domain/csvImport';
+import { readCategoryMemory, rememberCategory } from '@/storage/categoryMemory';
 import { formatBRL } from '@/lib/money';
 import { formatBR } from '@/lib/date';
 import { useKash } from '@/state/hooks';
@@ -37,6 +40,10 @@ export function StatementImport() {
   const [confirming, setConfirming] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [detected, setDetected] = useState(0);
+  // Lançamentos que o Kash não conseguiu classificar, esperando a pessoa dizer
+  // a categoria (e ensinar para as próximas importações).
+  const [review, setReview] = useState<Transaction[]>([]);
+  const [picks, setPicks] = useState<Record<string, string>>({});
 
   const existingKeys = new Set(
     transactions.map((t) =>
@@ -74,10 +81,12 @@ export function StatementImport() {
         ? preview.rows.filter((row) => !existingKeys.has(dedupeKey(row)))
         : preview.rows;
 
+    const learned = readCategoryMemory();
     const newTransactions = statementRowsToTransactions({
       rows: toImport,
       categories,
       account,
+      learned,
     });
 
     if (mode === 'replace') {
@@ -87,8 +96,16 @@ export function StatementImport() {
       await db.importAll({ ...snapshot, transactions: [] });
     }
 
-    await db.transactions.createMany(newTransactions);
+    const created = await db.transactions.createMany(newTransactions);
     await refresh();
+
+    // O que não bateu com nenhuma regra nem com o aprendizado fica pendente
+    // de revisão logo abaixo, sem sair da tela.
+    const semCategoria = created.filter(
+      (t) => !suggestCategory(t.description, categories, learned).matched,
+    );
+    setReview(semCategoria);
+    setPicks(Object.fromEntries(semCategoria.map((t) => [t.id, t.categoryId])));
 
     // Analisa o histórico já com os novos lançamentos: é o que transforma
     // "subi o extrato" em "descobri minhas contas fixas".
@@ -106,6 +123,23 @@ export function StatementImport() {
         (mode === 'replace' ? ' Os lançamentos anteriores foram removidos.' : ''),
     );
     setPreview(null);
+  }
+
+  async function applyReview() {
+    const changed = review.filter((t) => picks[t.id] && picks[t.id] !== t.categoryId);
+    for (const t of changed) {
+      const categoryId = picks[t.id]!;
+      await db.transactions.update(t.id, { categoryId });
+      rememberCategory(t.description, categoryId);
+    }
+    if (changed.length > 0) await refresh();
+    setResult((current) =>
+      current && changed.length > 0
+        ? `${current} ${changed.length} categoria(s) ajustada(s). O Kash vai lembrar na próxima.`
+        : current,
+    );
+    setReview([]);
+    setPicks({});
   }
 
   const income = preview?.rows.filter((r) => r.type === 'income') ?? [];
@@ -138,6 +172,53 @@ export function StatementImport() {
                 </Link>
               </p>
             )}
+          </div>
+        )}
+
+        {review.length > 0 && (
+          <div className="mt-4 rounded border border-warning bg-warning-container px-3 py-3 text-sm">
+            <p className="font-semibold text-on-surface">
+              Faltou classificar {review.length} lançamento{review.length > 1 ? 's' : ''}.
+            </p>
+            <p className="mt-1 text-xs text-on-surface-variant">
+              Diga a categoria de cada um. O Kash memoriza o estabelecimento e aplica sozinho nas
+              próximas importações.
+            </p>
+
+            <ul className="mt-3 flex flex-col gap-3">
+              {review.map((t) => (
+                <li key={t.id} className="flex flex-wrap items-end gap-2">
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-on-surface">{t.description}</span>
+                    <span className="text-xs text-on-surface-variant">
+                      {formatBR(t.date)} · {t.type === 'income' ? '+' : '−'} {formatBRL(t.amountCents)}
+                    </span>
+                  </span>
+                  <div className="w-40 shrink-0">
+                    <Select
+                      label="Categoria"
+                      value={picks[t.id] ?? t.categoryId}
+                      onChange={(e) => setPicks((p) => ({ ...p, [t.id]: e.target.value }))}
+                    >
+                      {categories
+                        .filter((c) => !c.archived)
+                        .map((c) => (
+                          <option key={c.id} value={c.id}>
+                            {c.name}
+                          </option>
+                        ))}
+                    </Select>
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Button onClick={applyReview}>Aplicar e memorizar</Button>
+              <Button variant="ghost" onClick={() => setReview([])}>
+                Deixar como estão
+              </Button>
+            </div>
           </div>
         )}
 
