@@ -1,0 +1,11 @@
+{
+  // Deploy da versão demo como site estático no Cloudflare Workers (Static Assets).
+  // Usado quando o projeto é criado pelo fluxo "Workers Builds" em vez do Pages clássico.
+  "name": "kash-controle-financeiro",
+  "compatibility_date": "2025-01-01",
+  "assets": {
+    "directory": "./dist",
+    // Serve o index.html (200) para qualquer rota desconhecida — o React Router cuida do resto.
+    "not_found_handling": "single-page-application"
+  }
+}
