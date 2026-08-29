@@ -141,7 +141,7 @@ export function SettingsPage() {
         <Card>
           <p className="text-sm text-on-surface-variant">
             Seus dados ficam apenas neste navegador. Se você limpar os dados do site, trocar de
-            navegador ou de computador, eles não vão junto — exporte um arquivo para não perder nada.
+            navegador ou de computador, eles não vão junto. Exporte um arquivo para não perder nada.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             <Button onClick={handleExport}>Exportar dados</Button>

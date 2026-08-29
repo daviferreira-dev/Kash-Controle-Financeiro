@@ -47,9 +47,12 @@ export function MonthSwitcher() {
   const anosComDados = useMemo(() => {
     const anos = new Set<number>();
     for (const m of mesesComDados) anos.add(Number(m.slice(0, 4)));
-    anos.add(Number(hoje.slice(0, 4)));
-    return [...anos].sort();
-  }, [mesesComDados, hoje]);
+    return anos;
+  }, [mesesComDados]);
+
+  // Janela de três anos ao redor do ano em foco. As setas movem a janela, e
+  // o ano do meio é sempre o que a grade de meses abaixo está mostrando.
+  const anosVisiveis = [visibleYear - 1, visibleYear, visibleYear + 1];
 
   useEffect(() => {
     if (open) setVisibleYear(Number(month.slice(0, 4)));
@@ -181,19 +184,26 @@ export function MonthSwitcher() {
               </button>
 
               <div className="flex items-center gap-1.5">
-                {anosComDados.slice(-3).map((ano) => (
+                {anosVisiveis.map((ano) => (
                   <button
                     key={ano}
                     type="button"
                     onClick={() => setVisibleYear(ano)}
+                    aria-current={ano === visibleYear ? 'true' : undefined}
                     className={cx(
-                      'min-h-11 rounded px-3 font-display text-lg font-bold transition',
+                      'relative min-h-11 rounded px-3 font-display font-bold transition',
                       ano === visibleYear
-                        ? 'text-on-surface'
-                        : 'text-on-surface-variant hover:text-on-surface',
+                        ? 'text-xl text-on-surface'
+                        : 'text-base text-on-surface-variant hover:text-on-surface',
                     )}
                   >
                     {ano}
+                    {anosComDados.has(ano) && ano !== visibleYear && (
+                      <span
+                        aria-hidden
+                        className="absolute bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-primary"
+                      />
+                    )}
                   </button>
                 ))}
               </div>

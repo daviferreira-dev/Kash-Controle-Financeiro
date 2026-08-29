@@ -64,7 +64,7 @@ function SuggestionCard({
       <p className="mt-1 text-xs text-on-surface-variant">
         {stable
           ? `Gasto regular, entre ${money.format(minCents)} e ${money.format(maxCents)}.`
-          : `Gasto irregular, de ${money.format(minCents)} a ${money.format(maxCents)} — o teto tem folga sobre o pior mês.`}
+          : `Gasto irregular, de ${money.format(minCents)} a ${money.format(maxCents)}. O teto tem folga sobre o pior mês.`}
       </p>
 
       <div className="mt-4 flex flex-wrap gap-2">
@@ -133,7 +133,7 @@ export function BudgetSuggestions() {
       </SectionHeader>
 
       <p className="mb-3 text-sm text-on-surface-variant">
-        Estes limites saem do que você gastou de fato nos meses já fechados — não de um palpite.
+        Estes limites saem do que você gastou de fato nos meses já fechados, não de um palpite.
       </p>
 
       <div className="flex flex-col gap-3">

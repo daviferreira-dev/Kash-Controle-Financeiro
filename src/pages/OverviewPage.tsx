@@ -166,7 +166,7 @@ export function OverviewPage() {
       {overview.isEmpty ? (
         <EmptyState
           title="Nada lançado neste mês"
-          description="Registre sua primeira receita ou despesa — ou importe o extrato do seu banco — para ver seu saldo, seus gastos por categoria e o histórico do período."
+          description="Registre sua primeira receita ou despesa, ou importe o extrato do seu banco, para ver seu saldo, seus gastos por categoria e o histórico do período."
           action={
             <div className="flex flex-wrap justify-center gap-2">
               <Link to="/transacoes">

@@ -141,7 +141,7 @@ export function computeInsights({
         description:
           rate >= 20
             ? 'Acima dos 20% que costumam ser recomendados como meta de poupança.'
-            : 'Guardar 20% da renda é uma meta comum — dá para mirar nisso no próximo mês.',
+            : 'Guardar 20% da renda é uma meta comum. Dá para mirar nisso no próximo mês.',
         amountCents: savedCents,
         percent: rate,
       });
@@ -174,7 +174,7 @@ export function computeInsights({
       description:
         share >= 50
           ? 'Uma categoria sozinha leva metade do que você gasta. Se quiser cortar despesa, é aqui que o corte pesa mais.'
-          : 'É sua maior categoria de gasto no mês — o melhor lugar para procurar economia.',
+          : 'É sua maior categoria de gasto no mês, o melhor lugar para procurar economia.',
       amountCents: topCents,
       percent: share,
     });
@@ -203,7 +203,7 @@ export function computeInsights({
         description:
           delta > 0
             ? 'Vale olhar quais categorias cresceram para entender de onde veio a diferença.'
-            : 'Boa — o mês fechou mais leve que o anterior.',
+            : 'Boa notícia: o mês fechou mais leve que o anterior.',
         amountCents: Math.abs(delta),
         percent,
       });
@@ -289,7 +289,7 @@ export function computeInsights({
         id: 'biggest-expense',
         tone: 'neutral',
         title: `Seu maior gasto foi ${formatCentsShort(biggest.amountCents)}`,
-        description: `"${truncate(biggest.description, 48)}" — sozinho, ${share.toFixed(0)}% de tudo que saiu no mês.`,
+        description: `"${truncate(biggest.description, 48)}", sozinho, foi ${share.toFixed(0)}% de tudo que saiu no mês.`,
         amountCents: biggest.amountCents,
         percent: share,
       });

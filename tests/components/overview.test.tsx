@@ -136,7 +136,7 @@ describe('navegação entre meses (FR-012)', () => {
   it('recalcula os indicadores ao trocar de mês', async () => {
     const { user } = await setup();
 
-    expect(screen.getByText(formatMonthLabel(currentMonth()))).toBeInTheDocument();
+    expect(screen.getAllByText(formatMonthLabel(currentMonth()))[0]).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'Mês anterior' }));
 
@@ -157,7 +157,7 @@ describe('navegação entre meses (FR-012)', () => {
     await user.click(screen.getByRole('button', { name: /Agosto|Janeiro|Fevereiro|Março|Abril|Maio|Junho|Julho|Setembro|Outubro|Novembro|Dezembro/ }));
     await user.click(await screen.findByRole('button', { name: 'Este mês' }));
 
-    expect(screen.getByText(formatMonthLabel(currentMonth()))).toBeInTheDocument();
+    expect(screen.getAllByText(formatMonthLabel(currentMonth()))[0]).toBeInTheDocument();
   });
 });
 

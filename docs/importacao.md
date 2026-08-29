@@ -20,7 +20,7 @@ O arquivo precisa ter um cabeçalho com, no mínimo, as colunas **Data**, **Valo
 - separador `,` ou `;`
 - data em `DD/MM/AAAA`, `DD-MM-AAAA` ou `AAAA-MM-DD`
 - valor com ponto (`-13.53`) ou vírgula (`-13,53`) decimal
-- coluna **Identificador** (opcional) — quando existe, é usada para de-duplicação exata
+- coluna **Identificador** (opcional): quando existe, é usada para de-duplicação exata
 
 O **sinal do valor define o tipo**: negativo vira despesa, positivo vira receita.
 
@@ -34,19 +34,19 @@ Se você exporta o mês inteiro até a data corrente, cada arquivo repete tudo q
 
 ### Detecção automática de recorrências
 
-Depois de cada importação, o Kash analisa **todo o histórico** procurando lançamentos que se repetem: mesmo destinatário, intervalo regular (semanal, mensal ou anual) e valores próximos. Ele agrupa mesmo quando a descrição muda entre os meses — `IMOBILIARIA DANELLI LTDA` e `IMOBILIARIA DANELLI` caem no mesmo padrão, assim como `IFOOD *PEDIDO 8213` e `IFOOD *PEDIDO 9471`.
+Depois de cada importação, o Kash analisa **todo o histórico** procurando lançamentos que se repetem: mesmo destinatário, intervalo regular (semanal, mensal ou anual) e valores próximos. Ele agrupa mesmo quando a descrição muda entre os meses: `IMOBILIARIA DANELLI LTDA` e `IMOBILIARIA DANELLI` caem no mesmo padrão, assim como `IFOOD *PEDIDO 8213` e `IFOOD *PEDIDO 9471`.
 
-O resultado aparece no aviso da importação e em *Recorrências → Padrões encontrados no seu histórico*, com a frequência, o valor típico, a faixa observada (útil em contas que variam, como luz) e a próxima data esperada. Nada é criado sozinho: você confirma com **Criar recorrência** ou descarta com **Não é recorrência** — e o descarte fica gravado, para o padrão não voltar a aparecer na próxima importação.
+O resultado aparece no aviso da importação e em *Recorrências → Padrões encontrados no seu histórico*, com a frequência, o valor típico, a faixa observada (útil em contas que variam, como luz) e a próxima data esperada. Nada é criado sozinho: você confirma com **Criar recorrência** ou descarta com **Não é recorrência**, e o descarte fica gravado, para o padrão não voltar a aparecer na próxima importação.
 
 **As recorrências criadas assim nascem pausadas.** É proposital: os lançamentos passados já estão no histórico, e gerar os próximos duplicaria o que vai chegar no extrato da semana seguinte. Pausada, a recorrência documenta a conta fixa e mostra o que ainda vai cair no mês, sem mexer nos números. Ative apenas se você parar de importar o extrato dessa conta.
 
-Um ponto de atenção relacionado: se você **ativar** uma recorrência (aluguel, assinatura) e esse mesmo pagamento também vier no extrato, os dois viram lançamentos separados e a despesa conta em dobro. Escolha um caminho por conta fixa — ou a recorrência ativa, ou o extrato.
+Um ponto de atenção relacionado: se você **ativar** uma recorrência (aluguel, assinatura) e esse mesmo pagamento também vier no extrato, os dois viram lançamentos separados e a despesa conta em dobro. Escolha um caminho por conta fixa: ou a recorrência ativa, ou o extrato.
 
 ### Por que CSV e não o PDF do extrato
 
-O PDF é diagramado em colunas visuais. Ao virar texto, os campos colam uns nos outros — no extrato real testado, `Conta: 13004481-6` ficava grudado em `175,00`, sem delimitador que permitisse separar com segurança. Para dado financeiro isso é inaceitável: o risco é importar o valor errado. O CSV tem colunas de verdade e um id por transação.
+O PDF é diagramado em colunas visuais. Ao virar texto, os campos colam uns nos outros. No extrato real testado, `Conta: 13004481-6` ficava grudado em `175,00`, sem delimitador que permitisse separar com segurança. Para dado financeiro isso é inaceitável: o risco é importar o valor errado. O CSV tem colunas de verdade e um id por transação.
 
-> **Nunca versione seus extratos.** Guarde-os em `private/` — o `.gitignore` bloqueia essa pasta inteira, além de `kash-backup-*.json` e `*.ofx`, porque esses arquivos contêm CPF, números de conta e nomes de terceiros.
+> **Nunca versione seus extratos.** Guarde-os em `private/`. O `.gitignore` bloqueia essa pasta inteira, além de `kash-backup-*.json` e `*.ofx`, porque esses arquivos contêm CPF, números de conta e nomes de terceiros.
 
 ---
 
@@ -55,7 +55,7 @@ O PDF é diagramado em colunas visuais. Ao virar texto, os campos colam uns nos 
 O botão **Importar dados** restaura o arquivo gerado por *Exportar dados*.
 
 - O formato aceito é o **JSON do próprio Kash**.
-- A importação **substitui integralmente** a base atual — não soma lançamentos. Por isso o app pede confirmação explícita antes.
+- A importação **substitui integralmente** a base atual, não soma lançamentos. Por isso o app pede confirmação explícita antes.
 
 ## O modelo
 
@@ -76,7 +76,7 @@ Para usar: edite o arquivo e vá em **Ajustes → Importar dados**.
 }
 ```
 
-As cinco coleções são obrigatórias, mesmo que vazias (`[]`). Um arquivo sem alguma delas é recusado — e a base atual permanece intacta.
+As cinco coleções são obrigatórias, mesmo que vazias (`[]`). Um arquivo sem alguma delas é recusado, e a base atual permanece intacta.
 
 ### Transação
 
@@ -117,7 +117,7 @@ Datas são civis (`AAAA-MM-DD`), sem hora e sem fuso. Só `createdAt`/`updatedAt
 
 `kind` é `"expense"`, `"income"` ou `"both"`. `color` precisa ser hex `#RRGGBB`. `initialBalanceCents` pode ser negativo.
 
-Os `categoryId` e `accountId` das transações têm que apontar para ids que existam **neste mesmo arquivo** — a importação substitui tudo, então referências para ids da base antiga ficariam órfãs.
+Os `categoryId` e `accountId` das transações têm que apontar para ids que existam **neste mesmo arquivo**. Como a importação substitui tudo, referências para ids da base antiga ficariam órfãs.
 
 ### Orçamento e recorrência
 

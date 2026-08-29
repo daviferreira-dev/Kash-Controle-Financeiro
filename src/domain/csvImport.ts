@@ -199,7 +199,7 @@ export function parseStatementCsv(content: string): ParseResult {
       continue;
     }
     if (signed === 0) {
-      errors.push({ line: lineNumber, message: 'Valor zerado — linha ignorada.', raw });
+      errors.push({ line: lineNumber, message: 'Valor zerado, linha ignorada.', raw });
       continue;
     }
 

@@ -129,7 +129,7 @@ export function WeekdayBars({ days }: { days: WeekdayPoint[] }) {
       </div>
 
       <p className="mt-3 text-sm text-on-surface-variant">
-        Você gasta mais <strong className="text-on-surface">{diaPorExtenso(pico.weekday)}</strong> —{' '}
+        Você gasta mais <strong className="text-on-surface">{diaPorExtenso(pico.weekday)}</strong>:{' '}
         {money.format(pico.totalCents)} no mês, em {pico.count}{' '}
         {pico.count === 1 ? 'lançamento' : 'lançamentos'}.
       </p>

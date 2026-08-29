@@ -63,7 +63,7 @@ export function AccountBalances() {
       <SectionHeader>Saldo das contas</SectionHeader>
       <Card>
         <p className="text-sm text-on-surface-variant">
-          O extrato em CSV traz os lançamentos, mas não o saldo da conta — e coisas como o
+          O extrato em CSV traz os lançamentos, mas não o saldo da conta, e coisas como o
           rendimento não aparecem em lançamento nenhum. Informe aqui o saldo que o app do banco
           mostra e o Kash acerta o resto sozinho.
         </p>

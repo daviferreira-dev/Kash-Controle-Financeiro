@@ -212,7 +212,7 @@ function DemoBanner() {
     <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 bg-tertiary-container px-4 py-2 text-xs text-on-surface md:text-sm">
       <p>
         <strong className="font-semibold">Versão de demonstração.</strong> Todos os dados são
-        fictícios e ficam só neste navegador — mexa à vontade.
+        fictícios e ficam só neste navegador. Pode mexer à vontade.
       </p>
       <button
         type="button"
@@ -241,7 +241,7 @@ function StorageWarning() {
   return (
     <div role="alert" className="bg-error-container px-4 py-3 text-sm text-on-error-container">
       <strong className="font-semibold">Seus dados não estão sendo salvos.</strong> O armazenamento
-      local deste navegador está indisponível ou cheio — o que você registrar será perdido ao fechar
+      local deste navegador está indisponível ou cheio. O que você registrar será perdido ao fechar
       a página. Verifique se está em janela anônima ou se o site tem permissão para guardar dados.
     </div>
   );

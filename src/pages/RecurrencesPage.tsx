@@ -308,7 +308,7 @@ export function RecurrencesPage() {
                         ? 'Nenhum lançamento novo será criado enquanto estiver pausada.'
                         : next
                           ? `Próximo lançamento em ${formatBR(next)}`
-                          : 'Já passou da data final — nada mais será lançado.'}
+                          : 'Já passou da data final. Nada mais será lançado.'}
                     </p>
                   </div>
 

@@ -122,7 +122,7 @@ export function StatementImport() {
         <p className="text-sm text-on-surface-variant">
           Exporte o extrato da sua conta em <strong>CSV</strong> pelo app do banco e escolha o
           arquivo aqui. O Kash lê data, valor e descrição, e sugere uma categoria para cada
-          lançamento — você revisa depois na lista de transações.
+          lançamento. Você revisa depois na lista de transações.
         </p>
 
         {result && (
@@ -168,7 +168,7 @@ export function StatementImport() {
                 [
                   'replace',
                   'Substituir tudo',
-                  'Apaga TODOS os lançamentos — inclusive os manuais e os de outras contas — e deixa só os deste extrato.',
+                  'Apaga TODOS os lançamentos, inclusive os manuais e os de outras contas, e deixa só os deste extrato.',
                 ],
               ] as const
             ).map(([value, label, hint]) => (
