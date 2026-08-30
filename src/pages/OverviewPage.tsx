@@ -180,29 +180,8 @@ export function OverviewPage() {
         />
       ) : (
         <>
-          {/* Leituras do mês */}
-          {insights.length > 0 && (
-            <Secao delay={0.1}>
-              <SectionHeader>O que os números dizem</SectionHeader>
-              <InsightList insights={insights} />
-            </Secao>
-          )}
-
-          {/* Evolução — o gráfico também navega no tempo */}
-          {temHistorico && (
-            <Secao delay={0.15}>
-              <SectionHeader>Últimos 6 meses</SectionHeader>
-              <Card>
-                <TrendChart points={serie} currentMonth={month} onSelectMonth={setMonth} />
-                <p className="mt-3 text-center text-xs text-on-surface-variant">
-                  Toque em um mês para abrir o período.
-                </p>
-              </Card>
-            </Secao>
-          )}
-
           {/* Distribuição por categoria */}
-          <Secao delay={0.2}>
+          <Secao delay={0.1}>
             <SectionHeader>Gastos por categoria</SectionHeader>
             <Card>
               {overview.breakdown.length === 0 ? (
@@ -256,6 +235,27 @@ export function OverviewPage() {
               )}
             </Card>
           </Secao>
+
+          {/* Leituras do mês */}
+          {insights.length > 0 && (
+            <Secao delay={0.15}>
+              <SectionHeader>O que os números dizem</SectionHeader>
+              <InsightList insights={insights} />
+            </Secao>
+          )}
+
+          {/* Evolução — o gráfico também navega no tempo */}
+          {temHistorico && (
+            <Secao delay={0.2}>
+              <SectionHeader>Últimos 6 meses</SectionHeader>
+              <Card>
+                <TrendChart points={serie} currentMonth={month} onSelectMonth={setMonth} />
+                <p className="mt-3 text-center text-xs text-on-surface-variant">
+                  Toque em um mês para abrir o período.
+                </p>
+              </Card>
+            </Secao>
+          )}
 
           {/* Ritmo semanal */}
           <Secao delay={0.25}>
