@@ -86,13 +86,13 @@ export function OverviewPage() {
   return (
     <div className="mx-auto flex max-w-4xl flex-col gap-6">
       <header className="relative z-30 flex flex-col gap-4">
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <h1 className="font-display text-2xl font-bold text-on-surface">Visão geral</h1>
           <button
             type="button"
             onClick={money.toggle}
             aria-pressed={money.hidden}
-            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-outline-variant px-3 text-sm font-medium text-on-surface-variant transition hover:bg-surface-container"
+            className="inline-flex min-h-11 shrink-0 items-center gap-2 whitespace-nowrap rounded-full border border-outline-variant px-3 text-sm font-medium text-on-surface-variant transition hover:bg-surface-container"
           >
             {money.hidden ? <EyeOffIcon /> : <EyeIcon />}
             <span className="hidden sm:inline">

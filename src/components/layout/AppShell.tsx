@@ -411,17 +411,14 @@ function NavItemLink({ item, variant }: { item: NavItem; variant: 'bottom' | 'si
             <motion.span
               layoutId={`nav-indicador-${variant}`}
               transition={reduceMotion ? { duration: 0 } : INDICADOR}
-              className={cx(
-                'absolute bg-primary',
-                bottom ? 'inset-x-1.5 inset-y-1 rounded-lg' : 'inset-0 rounded',
-              )}
+              className={cx('absolute inset-0 bg-primary', bottom ? 'rounded-lg' : 'rounded')}
             />
           )}
           <span
             className={cx(
               'relative flex items-center transition-colors duration-200',
               bottom
-                ? 'min-h-16 flex-col justify-center gap-1.5 py-2.5 text-xs font-medium'
+                ? 'min-h-14 flex-col justify-center gap-1 py-2 text-[11px] font-medium'
                 : 'min-h-11 gap-3 px-3 py-2.5 text-sm font-medium',
               isActive ? 'text-on-primary' : 'text-on-surface-variant',
             )}
