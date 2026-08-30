@@ -48,63 +48,63 @@ function BudgetCard({
         highlight && 'ring-2 ring-primary ring-offset-2 ring-offset-surface',
       )}
     >
-    <Card>
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-2">
-          <span
-            aria-hidden
-            className="h-3 w-3 shrink-0 rounded-full"
-            style={{ backgroundColor: category?.color ?? 'var(--color-outline)' }}
-          />
-          <h3 className="truncate font-semibold text-on-surface">
-            {category?.name ?? 'Categoria removida'}
-          </h3>
+      <Card>
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-2">
+            <span
+              aria-hidden
+              className="h-3 w-3 shrink-0 rounded-full"
+              style={{ backgroundColor: category?.color ?? 'var(--color-outline)' }}
+            />
+            <h3 className="truncate font-semibold text-on-surface">
+              {category?.name ?? 'Categoria removida'}
+            </h3>
+          </div>
+          {/* Rótulo textual, obrigatório além da cor (FR-016, SC-007) */}
+          <span className={cx('shrink-0 rounded px-2 py-0.5 text-xs font-semibold', styles.badge)}>
+            {statusLabel}
+          </span>
         </div>
-        {/* Rótulo textual, obrigatório além da cor (FR-016, SC-007) */}
-        <span className={cx('shrink-0 rounded px-2 py-0.5 text-xs font-semibold', styles.badge)}>
-          {statusLabel}
-        </span>
-      </div>
 
-      <div className="mt-3">
-        <div
-          role="progressbar"
-          aria-valuenow={Math.round(percentUsed)}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-label={`Consumo do orçamento de ${category?.name ?? 'categoria'}`}
-          className="h-2 w-full overflow-hidden rounded-full bg-surface-container-high"
-        >
+        <div className="mt-3">
           <div
-            className={cx('h-full rounded-full transition-all', styles.bar)}
-            style={{ width: `${Math.min(percentUsed, 100)}%` }}
-          />
+            role="progressbar"
+            aria-valuenow={Math.round(percentUsed)}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label={`Consumo do orçamento de ${category?.name ?? 'categoria'}`}
+            className="h-2 w-full overflow-hidden rounded-full bg-surface-container-high"
+          >
+            <div
+              className={cx('h-full rounded-full transition-all', styles.bar)}
+              style={{ width: `${Math.min(percentUsed, 100)}%` }}
+            />
+          </div>
         </div>
-      </div>
 
-      <div className="mt-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 text-sm">
-        <span className="text-on-surface-variant">
-          <span className="tabular font-semibold text-on-surface">{money.format(spentCents)}</span> de{' '}
-          <span className="tabular">{money.format(budget.limitCents)}</span>
-        </span>
-        <span className="tabular font-semibold text-on-surface">{percentUsed.toFixed(0)}%</span>
-      </div>
+        <div className="mt-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 text-sm">
+          <span className="text-on-surface-variant">
+            <span className="tabular font-semibold text-on-surface">{money.format(spentCents)}</span> de{' '}
+            <span className="tabular">{money.format(budget.limitCents)}</span>
+          </span>
+          <span className="tabular font-semibold text-on-surface">{percentUsed.toFixed(0)}%</span>
+        </div>
 
-      <p className={cx('mt-1 text-sm', exceeded ? 'font-semibold text-error' : 'text-on-surface-variant')}>
-        {exceeded
-          ? `Excedeu em ${money.format(Math.abs(remainingCents))}`
-          : `Restam ${money.format(remainingCents)}`}
-      </p>
+        <p className={cx('mt-1 text-sm', exceeded ? 'font-semibold text-error' : 'text-on-surface-variant')}>
+          {exceeded
+            ? `Excedeu em ${money.format(Math.abs(remainingCents))}`
+            : `Restam ${money.format(remainingCents)}`}
+        </p>
 
-      <div className="mt-4 flex gap-2">
-        <Button variant="secondary" onClick={onEdit}>
-          Alterar limite
-        </Button>
-        <Button variant="ghost" onClick={onDelete}>
-          Remover
-        </Button>
-      </div>
-    </Card>
+        <div className="mt-4 flex gap-2">
+          <Button variant="secondary" onClick={onEdit}>
+            Alterar limite
+          </Button>
+          <Button variant="ghost" onClick={onDelete}>
+            Remover
+          </Button>
+        </div>
+      </Card>
     </div>
   );
 }
