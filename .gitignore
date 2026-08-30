@@ -11,6 +11,9 @@ Thumbs.db
 .idea/
 .claude/skills/stitch/state.json
 
+# Documento de arquitetura publicado como artifact (fonte só local).
+kash-por-dentro.html
+
 # Extratos bancários e qualquer backup real: contêm dados pessoais
 # (CPF, contas, nomes de terceiros). Ficam em private/ e nunca são versionados.
 private/

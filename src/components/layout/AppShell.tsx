@@ -271,7 +271,7 @@ function BudgetAlert() {
               {alertas.map((a) => (
                 <li key={a.budget.id}>
                   <Link
-                    to="/orcamentos"
+                    to={`/orcamentos?foco=${a.budget.id}`}
                     onClick={() => {
                       setMonth(mes);
                       setOpen(false);

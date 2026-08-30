@@ -1,4 +1,5 @@
-import { useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { computeBudgetProgress, isBudgetActiveIn, type BudgetProgress } from '@/domain/budget';
 import { parseBRL, centsToInputValue } from '@/lib/money';
 import { ValidationError } from '@/lib/errors';
@@ -26,10 +27,12 @@ function BudgetCard({
   progress,
   onEdit,
   onDelete,
+  highlight = false,
 }: {
   progress: BudgetProgress;
   onEdit: () => void;
   onDelete: () => void;
+  highlight?: boolean;
 }) {
   const money = useMoney();
   const { budget, category, spentCents, remainingCents, percentUsed, status, statusLabel } =
@@ -38,6 +41,13 @@ function BudgetCard({
   const exceeded = status === 'exceeded';
 
   return (
+    <div
+      id={`orcamento-${budget.id}`}
+      className={cx(
+        'scroll-mt-6 rounded transition-shadow duration-300',
+        highlight && 'ring-2 ring-primary ring-offset-2 ring-offset-surface',
+      )}
+    >
     <Card>
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-center gap-2">
@@ -95,6 +105,7 @@ function BudgetCard({
         </Button>
       </div>
     </Card>
+    </div>
   );
 }
 
@@ -131,6 +142,34 @@ export function BudgetsPage() {
   const withoutBudget = expenseCategories.filter(
     (category) => !budgets.some((b) => b.categoryId === category.id),
   );
+
+  // Vindo do sino de atenção da barra superior: ?foco=<id do orçamento>.
+  // Rola até o card e o destaca por um instante, depois limpa a query.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [foco, setFoco] = useState<string | null>(null);
+
+  useEffect(() => {
+    const alvo = searchParams.get('foco');
+    if (!alvo) return;
+    setFoco(alvo);
+    const limpa = new URLSearchParams(searchParams);
+    limpa.delete('foco');
+    setSearchParams(limpa, { replace: true });
+    const t = setTimeout(() => setFoco(null), 2200);
+    return () => clearTimeout(t);
+  }, [searchParams, setSearchParams]);
+
+  useEffect(() => {
+    if (!foco) return;
+    // rAF: deixa o reset de scroll do AppShell (ao trocar de rota) acontecer
+    // primeiro, senão ele joga a página de volta pro topo.
+    const raf = requestAnimationFrame(() => {
+      document
+        .getElementById(`orcamento-${foco}`)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [foco, progresses]);
 
   function openCreate() {
     setEditingCategoryId(withoutBudget[0]?.id ?? '');
@@ -211,6 +250,7 @@ export function BudgetsPage() {
             <BudgetCard
               key={progress.budget.id}
               progress={progress}
+              highlight={foco === progress.budget.id}
               onEdit={() => openEdit(progress)}
               onDelete={() => setPendingDelete(progress.budget.id)}
             />
