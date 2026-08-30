@@ -236,7 +236,7 @@ const CATEGORY_HINTS: Array<{ category: string; patterns: RegExp }> = [
   },
   {
     category: 'Transporte',
-    patterns: /uber|99app|99\s?pop|cabify|posto|combustivel|gasolina|shell|ipiranga|estacionamento|metro|onibus|passagem|taxi/i,
+    patterns: /uber|99[\s*]*(app|pop|taxi|tec)|cabify|indriv|blablacar|posto|combustivel|gasolina|shell|ipiranga|petrobras|estacionamento|zona\s?azul|pedagio|sem\s?parar|conectcar|veloe|metro\b|cptm|onibus|bilhete\s?unico|passagem|\btaxi\b/i,
   },
   {
     category: 'Moradia',

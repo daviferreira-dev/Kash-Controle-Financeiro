@@ -38,6 +38,18 @@ export function rememberCategory(description: string, categoryId: string): void 
   }
 }
 
+/** Esquece um estabelecimento específico. */
+export function forgetCategory(key: string): void {
+  try {
+    const current = readCategoryMemory();
+    if (!(key in current)) return;
+    delete current[key];
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(current));
+  } catch {
+    // nada a fazer
+  }
+}
+
 /** Esquece tudo que foi ensinado (usado quando a pessoa recomeça do zero). */
 export function clearCategoryMemory(): void {
   try {

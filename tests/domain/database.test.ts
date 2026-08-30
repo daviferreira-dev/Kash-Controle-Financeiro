@@ -80,6 +80,22 @@ describe('seedIfEmpty (FR-026)', () => {
 
     expect(await db.categories.list()).toHaveLength(9);
   });
+
+  it('numa base antiga, acrescenta só as categorias padrão que faltam', async () => {
+    // Simula quem começou a usar o app antes de "Contas de casa" existir.
+    await db.seedIfEmpty();
+    const semContas = (await db.categories.list()).filter((c) => c.name !== 'Contas de casa');
+    db.categories.replaceAll(semContas);
+    expect(await db.categories.list()).toHaveLength(8);
+
+    await db.seedIfEmpty();
+
+    const nomes = (await db.categories.list()).map((c) => c.name);
+    expect(nomes).toHaveLength(9);
+    expect(nomes).toContain('Contas de casa');
+    // e não mexeu em nada além disso
+    expect(nomes.filter((n) => n === 'Alimentação')).toHaveLength(1);
+  });
 });
 
 describe('CRUD básico', () => {

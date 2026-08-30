@@ -3,6 +3,11 @@ import { useAccounts, useCategories, useKash } from '@/state/hooks';
 import { IntegrityError } from '@/lib/errors';
 import { formatBRL } from '@/lib/money';
 import { transactionsToCsv } from '@/domain/spreadsheet';
+import {
+  clearCategoryMemory,
+  forgetCategory,
+  readCategoryMemory,
+} from '@/storage/categoryMemory';
 import { Button, Card, ConfirmDialog, Input, SectionHeader, cx, useToast } from '@/components/ui';
 import { Link } from 'react-router-dom';
 import { AccountBalances } from '@/components/settings/AccountBalances';
@@ -22,6 +27,8 @@ export function SettingsPage() {
   const [pendingImport, setPendingImport] = useState<unknown>(null);
   const [newCategory, setNewCategory] = useState('');
   const [newAccount, setNewAccount] = useState('');
+  // Aprendizado do importador (mora no localStorage, fora do estado do app).
+  const [learned, setLearned] = useState<Record<string, string>>(() => readCategoryMemory());
 
   async function handleExport() {
     try {
@@ -206,6 +213,57 @@ export function SettingsPage() {
           </Link>
         </Card>
       </section>
+
+      {Object.keys(learned).length > 0 && (
+        <section>
+          <SectionHeader>Categorias que o Kash aprendeu</SectionHeader>
+          <Card>
+            <p className="text-sm text-on-surface-variant">
+              Quando você classifica um lançamento que o importador não reconheceu, ele guarda o
+              estabelecimento aqui e aplica sozinho nas próximas importações. Esqueça o que estiver
+              errado.
+            </p>
+
+            <ul className="mt-4 divide-y divide-outline-variant">
+              {Object.entries(learned).map(([key, categoryId]) => {
+                const category = categories.find((c) => c.id === categoryId);
+                return (
+                  <li key={key} className="flex items-center justify-between gap-3 py-2.5">
+                    <span className="min-w-0">
+                      <span className="block truncate text-sm text-on-surface">{key}</span>
+                      <span className="text-xs text-on-surface-variant">
+                        → {category?.name ?? 'categoria removida'}
+                      </span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        forgetCategory(key);
+                        setLearned(readCategoryMemory());
+                      }}
+                      className="inline-flex min-h-11 shrink-0 items-center justify-center rounded px-3 text-xs font-medium text-on-surface-variant transition hover:bg-surface-container"
+                    >
+                      Esquecer
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+
+            <div className="mt-4">
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  clearCategoryMemory();
+                  setLearned({});
+                }}
+              >
+                Esquecer tudo
+              </Button>
+            </div>
+          </Card>
+        </section>
+      )}
 
       {/* Categorias */}
       <section>

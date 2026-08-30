@@ -272,7 +272,10 @@ class LocalKashDatabase implements KashDatabase {
   }
 
   /**
-   * Idempotente: só semeia quando a coleção correspondente está vazia.
+   * Semeia uma base vazia e, numa base já criada, acrescenta só as categorias
+   * e contas padrão que passaram a existir depois (comparando por nome). Assim
+   * quem já usava o app ganha uma categoria nova (ex.: "Contas de casa") sem
+   * limpar dados nem cadastrar na mão. Nada existente é tocado.
    *
    * Ler e escrever **sem nenhum await no meio** é o que garante a
    * idempotência. Com `await` entre a leitura e a gravação, o StrictMode do
@@ -281,13 +284,24 @@ class LocalKashDatabase implements KashDatabase {
    * Como o JavaScript é single-thread, o bloco síncrono abaixo é atômico.
    */
   async seedIfEmpty(): Promise<void> {
-    if (this.readCollection(STORAGE_KEYS.categories).length === 0) {
+    const categories = this.readCollection(STORAGE_KEYS.categories);
+    if (categories.length === 0) {
       this.categories.replaceAll(
         DEFAULT_CATEGORIES.map((category) => ({ ...category, id: newId() })),
       );
+    } else {
+      const known = new Set(categories.map((c) => c.name as string));
+      const missing = DEFAULT_CATEGORIES.filter((c) => !known.has(c.name));
+      if (missing.length > 0) {
+        this.categories.replaceAll([
+          ...(categories as unknown as Category[]),
+          ...missing.map((category) => ({ ...category, id: newId() })),
+        ]);
+      }
     }
 
-    if (this.readCollection(STORAGE_KEYS.accounts).length === 0) {
+    const accounts = this.readCollection(STORAGE_KEYS.accounts);
+    if (accounts.length === 0) {
       this.accounts.replaceAll(DEFAULT_ACCOUNTS.map((account) => ({ ...account, id: newId() })));
     }
 

@@ -221,6 +221,8 @@ describe('suggestCategoryId', () => {
   it('reconhece transporte', () => {
     expect(nameOf(suggestCategoryId('UBER *TRIP', categories))).toBe('Transporte');
     expect(nameOf(suggestCategoryId('POSTO IPIRANGA', categories))).toBe('Transporte');
+    expect(nameOf(suggestCategoryId('Compra no débito - 99 *POP', categories))).toBe('Transporte');
+    expect(nameOf(suggestCategoryId('Compra no débito - SEM PARAR PEDAGIO', categories))).toBe('Transporte');
   });
 
   it('reconhece assinaturas', () => {
