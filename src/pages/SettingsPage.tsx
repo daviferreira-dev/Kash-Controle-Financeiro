@@ -40,7 +40,9 @@ export function SettingsPage() {
       link.href = url;
       link.download = `kash-backup-${new Date().toISOString().slice(0, 10)}.json`;
       link.click();
-      URL.revokeObjectURL(url);
+      // Revoga depois do tick: alguns navegadores (Firefox) ainda não
+      // dispararam o download quando o revoke roda de forma síncrona.
+      setTimeout(() => URL.revokeObjectURL(url), 0);
 
       setFeedback({ kind: 'success', message: 'Backup baixado com sucesso.' });
     } catch {
@@ -64,7 +66,9 @@ export function SettingsPage() {
       link.href = url;
       link.download = `kash-lancamentos-${new Date().toISOString().slice(0, 10)}.csv`;
       link.click();
-      URL.revokeObjectURL(url);
+      // Revoga depois do tick: alguns navegadores (Firefox) ainda não
+      // dispararam o download quando o revoke roda de forma síncrona.
+      setTimeout(() => URL.revokeObjectURL(url), 0);
 
       setFeedback({ kind: 'success', message: 'Planilha baixada. Abra no Excel ou no Google Sheets.' });
     } catch {

@@ -126,16 +126,22 @@ export function StatementImport() {
   }
 
   async function applyReview() {
-    const changed = review.filter((t) => picks[t.id] && picks[t.id] !== t.categoryId);
-    for (const t of changed) {
-      const categoryId = picks[t.id]!;
-      await db.transactions.update(t.id, { categoryId });
+    // "Aplicar e memorizar" sempre ensina — inclusive quando a pessoa confirma
+    // que é mesmo "Outros" —, senão o mesmo lançamento volta pra revisão a cada
+    // importação. Só grava a transação de novo quando a categoria mudou.
+    let updated = 0;
+    for (const t of review) {
+      const categoryId = picks[t.id] ?? t.categoryId;
+      if (categoryId !== t.categoryId) {
+        await db.transactions.update(t.id, { categoryId });
+        updated += 1;
+      }
       rememberCategory(t.description, categoryId);
     }
-    if (changed.length > 0) await refresh();
+    if (updated > 0) await refresh();
     setResult((current) =>
-      current && changed.length > 0
-        ? `${current} ${changed.length} categoria(s) ajustada(s). O Kash vai lembrar na próxima.`
+      current
+        ? `${current} ${review.length} lançamento(s) revisado(s). O Kash vai lembrar na próxima.`
         : current,
     );
     setReview([]);

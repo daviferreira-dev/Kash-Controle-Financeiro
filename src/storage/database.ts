@@ -30,6 +30,13 @@ import type {
   TransactionRepository,
 } from './repository';
 
+/**
+ * Categorias-semente introduzidas depois da v1. `seedIfEmpty` acrescenta só
+ * estas numa base já existente. Ao criar uma categoria padrão nova no futuro,
+ * adicione o nome aqui.
+ */
+const LATE_DEFAULT_CATEGORIES = new Set<string>(['Contas de casa']);
+
 /** Ordena por data decrescente e, no empate, pelo mais recentemente criado. */
 function byDateDesc(a: Transaction, b: Transaction): number {
   if (a.date !== b.date) return a.date < b.date ? 1 : -1;
@@ -272,10 +279,15 @@ class LocalKashDatabase implements KashDatabase {
   }
 
   /**
-   * Semeia uma base vazia e, numa base já criada, acrescenta só as categorias
-   * e contas padrão que passaram a existir depois (comparando por nome). Assim
-   * quem já usava o app ganha uma categoria nova (ex.: "Contas de casa") sem
-   * limpar dados nem cadastrar na mão. Nada existente é tocado.
+   * Semeia uma base vazia e, numa base já criada, acrescenta apenas as
+   * categorias listadas em `LATE_DEFAULT_CATEGORIES` — categorias-semente que
+   * nasceram depois da v1. Assim quem já usava o app ganha uma categoria nova
+   * (ex.: "Contas de casa") sem limpar dados nem cadastrar na mão.
+   *
+   * É uma allowlist de propósito: não "recria toda default que sumiu". Uma
+   * categoria padrão não pode ser excluída (só arquivada), então o nome dela
+   * nunca some da coleção — mas uma renomeada via import de backup não deve
+   * fazer o Kash ressuscitar a original.
    *
    * Ler e escrever **sem nenhum await no meio** é o que garante a
    * idempotência. Com `await` entre a leitura e a gravação, o StrictMode do
@@ -291,7 +303,9 @@ class LocalKashDatabase implements KashDatabase {
       );
     } else {
       const known = new Set(categories.map((c) => c.name as string));
-      const missing = DEFAULT_CATEGORIES.filter((c) => !known.has(c.name));
+      const missing = DEFAULT_CATEGORIES.filter(
+        (c) => LATE_DEFAULT_CATEGORIES.has(c.name) && !known.has(c.name),
+      );
       if (missing.length > 0) {
         this.categories.replaceAll([
           ...(categories as unknown as Category[]),

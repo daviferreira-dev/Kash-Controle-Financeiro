@@ -81,19 +81,22 @@ describe('seedIfEmpty (FR-026)', () => {
     expect(await db.categories.list()).toHaveLength(9);
   });
 
-  it('numa base antiga, acrescenta só as categorias padrão que faltam', async () => {
-    // Simula quem começou a usar o app antes de "Contas de casa" existir.
+  it('numa base antiga, acrescenta só as categorias da allowlist que faltam', async () => {
+    // Simula quem começou antes de "Contas de casa" existir e que também
+    // apagou "Lazer" da base (via import de backup, por exemplo).
     await db.seedIfEmpty();
-    const semContas = (await db.categories.list()).filter((c) => c.name !== 'Contas de casa');
-    db.categories.replaceAll(semContas);
-    expect(await db.categories.list()).toHaveLength(8);
+    const base = (await db.categories.list()).filter(
+      (c) => c.name !== 'Contas de casa' && c.name !== 'Lazer',
+    );
+    db.categories.replaceAll(base);
+    expect(await db.categories.list()).toHaveLength(7);
 
     await db.seedIfEmpty();
 
     const nomes = (await db.categories.list()).map((c) => c.name);
-    expect(nomes).toHaveLength(9);
-    expect(nomes).toContain('Contas de casa');
-    // e não mexeu em nada além disso
+    expect(nomes).toContain('Contas de casa'); // está na allowlist -> volta
+    expect(nomes).not.toContain('Lazer'); // não está -> fica como a pessoa deixou
+    expect(nomes).toHaveLength(8);
     expect(nomes.filter((n) => n === 'Alimentação')).toHaveLength(1);
   });
 });
