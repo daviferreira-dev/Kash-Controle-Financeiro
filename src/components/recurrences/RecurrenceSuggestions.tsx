@@ -7,7 +7,7 @@ import {
 } from '@/domain/recurrenceDetection';
 import { formatBR, today } from '@/lib/date';
 import { useKash, useMoney, useRecurrences } from '@/state/hooks';
-import { Button, Card, SectionHeader, cx } from '@/components/ui';
+import { Button, Card, SectionHeader, cx, useToast } from '@/components/ui';
 
 const DISMISSED_KEY = 'kash:dismissedPatterns';
 
@@ -97,6 +97,7 @@ function SuggestionCard({
 export function RecurrenceSuggestions() {
   const { transactions, recurrences } = useKash();
   const { create } = useRecurrences();
+  const { notify } = useToast();
 
   const [dismissed, setDismissed] = useState<string[]>(readDismissed);
   const [busyKey, setBusyKey] = useState<string | null>(null);
@@ -135,6 +136,7 @@ export function RecurrenceSuggestions() {
         status: 'paused',
         lastGeneratedDate: suggestion.lastDate,
       });
+      notify(`"${suggestion.label}" criada como recorrência.`);
     } finally {
       setBusyKey(null);
     }

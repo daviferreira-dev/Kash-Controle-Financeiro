@@ -92,7 +92,7 @@ describe('criação de lançamentos (User Story 1)', () => {
     await user.type(form.getByLabelText('Valor'), '10,00');
     await user.type(form.getByLabelText('Descrição'), 'Café');
     await user.click(form.getByRole('button', { name: /Alimentação/ }));
-    await user.selectOptions(form.getByLabelText('Conta'), 'Carteira');
+    await user.selectOptions(form.getByLabelText('Conta'), 'Itaú');
     await user.click(form.getByRole('button', { name: 'Salvar transação' }));
 
     await screen.findByText('Café');

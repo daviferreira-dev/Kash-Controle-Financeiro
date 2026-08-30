@@ -15,7 +15,7 @@ import { readCategoryMemory, rememberCategory } from '@/storage/categoryMemory';
 import { formatBRL } from '@/lib/money';
 import { formatBR } from '@/lib/date';
 import { useKash } from '@/state/hooks';
-import { Button, Card, ConfirmDialog, Select, cx } from '@/components/ui';
+import { Button, Card, Chip, ConfirmDialog, Select, cx } from '@/components/ui';
 
 type Mode = 'replace' | 'append';
 
@@ -148,6 +148,11 @@ export function StatementImport() {
     setPicks({});
   }
 
+  // Agrupa por descrição: o mesmo estabelecimento costuma aparecer várias vezes
+  // no extrato (ex.: "UBER *TRIP" 5x), e escolher a categoria uma vez por grupo
+  // é bem mais rápido do que repetir a mesma escolha em cada lançamento.
+  const reviewGroups = groupReviewByDescription(review);
+
   const income = preview?.rows.filter((r) => r.type === 'income') ?? [];
   const expense = preview?.rows.filter((r) => r.type === 'expense') ?? [];
   const incomeCents = income.reduce((sum, r) => sum + r.amountCents, 0);
@@ -182,44 +187,94 @@ export function StatementImport() {
         )}
 
         {review.length > 0 && (
-          <div className="mt-4 rounded border border-warning bg-warning-container px-3 py-3 text-sm">
-            <p className="font-semibold text-on-surface">
-              Faltou classificar {review.length} lançamento{review.length > 1 ? 's' : ''}.
-            </p>
-            <p className="mt-1 text-xs text-on-surface-variant">
-              Diga a categoria de cada um. O Kash memoriza o estabelecimento e aplica sozinho nas
-              próximas importações.
-            </p>
+          <div className="mt-4 rounded-lg border border-warning bg-warning-container p-4">
+            <div className="flex items-start gap-3">
+              <span
+                aria-hidden
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-surface-container-lowest text-lg"
+              >
+                🏷️
+              </span>
+              <div>
+                <p className="font-semibold text-on-surface">
+                  Faltou classificar {review.length} lançamento{review.length > 1 ? 's' : ''}
+                  {reviewGroups.length < review.length && ` (${reviewGroups.length} estabelecimentos)`}
+                </p>
+                <p className="mt-0.5 text-xs text-on-surface-variant">
+                  Toque na categoria certa. O Kash aplica em todos os lançamentos do mesmo
+                  estabelecimento e memoriza para as próximas importações.
+                </p>
+              </div>
+            </div>
 
-            <ul className="mt-3 flex flex-col gap-3">
-              {review.map((t) => (
-                <li key={t.id} className="flex flex-wrap items-end gap-2">
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-on-surface">{t.description}</span>
-                    <span className="text-xs text-on-surface-variant">
-                      {formatBR(t.date)} · {t.type === 'income' ? '+' : '−'} {formatBRL(t.amountCents)}
-                    </span>
-                  </span>
-                  <div className="w-40 shrink-0">
-                    <Select
-                      label="Categoria"
-                      value={picks[t.id] ?? t.categoryId}
-                      onChange={(e) => setPicks((p) => ({ ...p, [t.id]: e.target.value }))}
+            <ul className="mt-4 flex flex-col gap-2.5">
+              {reviewGroups.map((group) => {
+                const { description, items } = group;
+                const first = items[0]!;
+                const options = categories.filter((c) => !c.archived);
+                const picked = picks[first.id] ?? first.categoryId;
+                const total = items.reduce(
+                  (sum, t) => sum + (t.type === 'income' ? t.amountCents : -t.amountCents),
+                  0,
+                );
+
+                return (
+                  <li
+                    key={description}
+                    className="rounded border border-outline-variant bg-surface-container-lowest p-3"
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="min-w-0 truncate text-sm font-medium text-on-surface">
+                        {description}
+                        {items.length > 1 && (
+                          <span className="ml-1.5 rounded-full bg-surface-container px-1.5 py-0.5 text-xs font-semibold text-on-surface-variant">
+                            ×{items.length}
+                          </span>
+                        )}
+                      </span>
+                      <span
+                        className={cx(
+                          'tabular shrink-0 text-sm font-semibold',
+                          total >= 0 ? 'text-income' : 'text-expense',
+                        )}
+                      >
+                        {total >= 0 ? '+' : '−'} {formatBRL(Math.abs(total))}
+                      </span>
+                    </div>
+                    <p className="mt-0.5 text-xs text-on-surface-variant">
+                      {items.length > 1
+                        ? `${items.length} lançamentos entre ${formatBR(items[items.length - 1]!.date)} e ${formatBR(first.date)}`
+                        : formatBR(first.date)}
+                    </p>
+
+                    <div
+                      role="radiogroup"
+                      aria-label={`Categoria de ${description}`}
+                      className="mt-3 flex flex-wrap gap-1.5"
                     >
-                      {categories
-                        .filter((c) => !c.archived)
-                        .map((c) => (
-                          <option key={c.id} value={c.id}>
-                            {c.name}
-                          </option>
-                        ))}
-                    </Select>
-                  </div>
-                </li>
-              ))}
+                      {options.map((c) => (
+                        <Chip
+                          key={c.id}
+                          color={c.color}
+                          selected={picked === c.id}
+                          onClick={() =>
+                            setPicks((p) => {
+                              const next = { ...p };
+                              for (const t of items) next[t.id] = c.id;
+                              return next;
+                            })
+                          }
+                        >
+                          {c.name}
+                        </Chip>
+                      ))}
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
 
-            <div className="mt-3 flex flex-wrap gap-2">
+            <div className="mt-4 flex flex-wrap gap-2 border-t border-outline-variant/60 pt-3">
               <Button onClick={applyReview}>Aplicar e memorizar</Button>
               <Button variant="ghost" onClick={() => setReview([])}>
                 Deixar como estão
@@ -408,6 +463,26 @@ export function StatementImport() {
       />
     </section>
   );
+}
+
+interface ReviewGroup {
+  description: string;
+  items: Transaction[];
+}
+
+/**
+ * Agrupa lançamentos pendentes de revisão pela descrição, mantendo a ordem de
+ * primeira aparição. Escolher a categoria de um grupo aplica a todos os
+ * lançamentos daquele estabelecimento de uma vez.
+ */
+function groupReviewByDescription(review: Transaction[]): ReviewGroup[] {
+  const groups = new Map<string, Transaction[]>();
+  for (const t of review) {
+    const existing = groups.get(t.description);
+    if (existing) existing.push(t);
+    else groups.set(t.description, [t]);
+  }
+  return Array.from(groups, ([description, items]) => ({ description, items }));
 }
 
 /** Recupera o id do banco gravado nas observações por uma importação anterior. */

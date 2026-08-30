@@ -82,7 +82,7 @@ Onde o dinheiro está.
 | `archived` | `boolean` | sim | Default `false` |
 | `isDefault` | `boolean` | sim | `true` nas 3 contas-semente |
 
-**Seed obrigatório (FR-026)**: Nubank, Itaú, Carteira.
+**Seed obrigatório (FR-026)**: Nubank, Itaú.
 
 Mesmas regras de arquivamento e exclusão da `Category`.
 

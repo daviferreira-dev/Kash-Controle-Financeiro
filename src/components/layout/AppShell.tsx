@@ -4,7 +4,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { useKash, useMoney } from '@/state/hooks';
 import { computeBudgetProgress, isBudgetActiveIn } from '@/domain/budget';
 import { currentMonth } from '@/lib/date';
-import { cx } from '@/components/ui';
+import { cx, useMobilePopoverPosition } from '@/components/ui';
 import logoLight from '@/assets/brand/logo-light.png';
 import logoDark from '@/assets/brand/logo-dark.png';
 import iconOverview from '@/assets/icons/overview.png';
@@ -203,6 +203,8 @@ function BudgetAlert() {
   const money = useMoney();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const mobileStyle = useMobilePopoverPosition(open, buttonRef);
   const mes = currentMonth();
 
   const alertas = budgets
@@ -236,6 +238,7 @@ function BudgetAlert() {
   return (
     <div ref={ref} className="relative">
       <button
+        ref={buttonRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
@@ -258,11 +261,15 @@ function BudgetAlert() {
           <motion.div
             role="dialog"
             aria-label="Orçamentos pedindo atenção"
+            style={mobileStyle ?? undefined}
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.16, ease: [0.2, 0.8, 0.2, 1] }}
-            className="absolute right-0 top-full z-50 mt-2 w-[min(20rem,calc(100vw-2rem))] rounded-lg border border-outline-variant bg-surface-container-lowest p-2 shadow-ambient"
+            className={cx(
+              'z-50 rounded-lg border border-outline-variant bg-surface-container-lowest p-2 shadow-ambient',
+              mobileStyle ? 'w-auto' : 'absolute right-0 top-full mt-2 w-80',
+            )}
           >
             <p className="px-2 pb-1 pt-1 font-label text-label-caps uppercase text-on-surface-variant">
               Pedindo atenção neste mês
@@ -404,14 +411,17 @@ function NavItemLink({ item, variant }: { item: NavItem; variant: 'bottom' | 'si
             <motion.span
               layoutId={`nav-indicador-${variant}`}
               transition={reduceMotion ? { duration: 0 } : INDICADOR}
-              className={cx('absolute inset-0 bg-primary', bottom ? 'rounded-lg' : 'rounded')}
+              className={cx(
+                'absolute bg-primary',
+                bottom ? 'inset-x-1.5 inset-y-1 rounded-lg' : 'inset-0 rounded',
+              )}
             />
           )}
           <span
             className={cx(
               'relative flex items-center transition-colors duration-200',
               bottom
-                ? 'min-h-14 flex-col justify-center gap-1 py-2 text-xs font-medium'
+                ? 'min-h-16 flex-col justify-center gap-1.5 py-2.5 text-xs font-medium'
                 : 'min-h-11 gap-3 px-3 py-2.5 text-sm font-medium',
               isActive ? 'text-on-primary' : 'text-on-surface-variant',
             )}
@@ -495,7 +505,7 @@ export function AppShell() {
 
           <main
             ref={mainRef}
-            className="sem-barra flex-1 overflow-y-auto px-5 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-5 md:px-8 md:pb-8 lg:px-16"
+            className="sem-barra flex-1 overflow-y-auto px-5 pb-[calc(6.5rem+env(safe-area-inset-bottom))] pt-5 md:px-8 md:pb-8 lg:px-16"
           >
             {loading ? (
               <p className="py-16 text-center text-sm text-on-surface-variant">Carregando…</p>
@@ -511,7 +521,7 @@ export function AppShell() {
       {/* Navegação inferior até md */}
       <nav
         aria-label="Navegação principal"
-        className="fixed inset-x-0 bottom-0 z-40 flex gap-1 border-t border-outline-variant bg-surface-container-lowest p-1 pb-[calc(0.25rem+env(safe-area-inset-bottom))] md:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 flex gap-1 border-t border-outline-variant bg-surface-container-lowest px-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-1.5 shadow-[0_-8px_24px_rgba(0,0,0,0.06)] md:hidden"
       >
         {NAV_ITEMS.map((item) => (
           <NavItemLink key={item.to} item={item} variant="bottom" />

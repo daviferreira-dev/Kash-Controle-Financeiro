@@ -36,7 +36,6 @@ const CATEGORIES: Category[] = [
 const ACCOUNTS: Account[] = [
   { id: 'demo-acc-nubank', name: 'Nubank', initialBalanceCents: 284000, archived: false, isDefault: true },
   { id: 'demo-acc-itau', name: 'Itaú', initialBalanceCents: 1637000, archived: false, isDefault: true },
-  { id: 'demo-acc-carteira', name: 'Carteira', initialBalanceCents: 9000, archived: false, isDefault: true },
 ];
 
 const CAT = Object.fromEntries(CATEGORIES.map((c) => [c.name, c.id])) as Record<string, string>;
@@ -71,7 +70,7 @@ const EXPENSE_PATTERNS: Pattern[] = [
   { category: 'Saúde', account: 'Nubank', perMonth: [0, 2], cents: [4500, 29000], descriptions: ['Farmácia', 'Consulta médica', 'Academia', 'Exame laboratorial'] },
   { category: 'Educação', account: 'Nubank', perMonth: [0, 1], cents: [8900, 24900], descriptions: ['Curso online Udemy', 'Livro técnico', 'Mensalidade de inglês'] },
   { category: 'Assinaturas', account: 'Nubank', perMonth: [1, 2], cents: [1990, 3490], descriptions: ['Spotify', 'iCloud', 'Jornal digital'] },
-  { category: 'Outros', account: 'Carteira', perMonth: [1, 2], cents: [1800, 12000], descriptions: ['Presente', 'Pet shop', 'Doação', 'Feira de rua'] },
+  { category: 'Outros', account: 'Nubank', perMonth: [1, 2], cents: [1800, 12000], descriptions: ['Presente', 'Pet shop', 'Doação', 'Feira de rua'] },
 ];
 
 interface RecSpec {

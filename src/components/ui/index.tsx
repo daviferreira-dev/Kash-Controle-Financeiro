@@ -4,9 +4,12 @@ import {
   useEffect,
   useId,
   useRef,
+  useState,
   type ButtonHTMLAttributes,
+  type CSSProperties,
   type InputHTMLAttributes,
   type ReactNode,
+  type RefObject,
   type SelectHTMLAttributes,
   type TextareaHTMLAttributes,
 } from 'react';
@@ -14,6 +17,56 @@ import {
 /** Junta classes ignorando os valores falsy. */
 export function cx(...classes: Array<string | false | null | undefined>): string {
   return classes.filter(Boolean).join(' ');
+}
+
+/**
+ * Posição de um popover (menu de mês, alerta de orçamento…) no celular.
+ *
+ * Um popover ancorado por `right-0`/`left-1/2` no botão que o abre pode nascer
+ * fora da tela quando esse botão não está centralizado — foi o caso do sino de
+ * orçamento e do seletor de mês, que "abriam pro lado" e ficavam cortados. Em
+ * telas estreitas (< 640px, o breakpoint `sm` do Tailwind) este hook devolve
+ * um `style` fixo, colado embaixo do botão mas com as bordas presas às
+ * margens da tela — cabe sempre inteiro. Em telas maiores devolve `null` e o
+ * componente volta a usar o posicionamento absoluto normal, ancorado no botão.
+ */
+export function useMobilePopoverPosition(
+  open: boolean,
+  anchorRef: RefObject<HTMLElement>,
+): CSSProperties | null {
+  const [style, setStyle] = useState<CSSProperties | null>(null);
+
+  useEffect(() => {
+    if (!open) {
+      setStyle(null);
+      return;
+    }
+
+    function update() {
+      const anchor = anchorRef.current;
+      // jsdom (testes) não implementa matchMedia — trata como desktop, igual
+      // a um navegador antigo sem suporte: cai no posicionamento normal.
+      const isMobile =
+        typeof window.matchMedia === 'function' &&
+        window.matchMedia('(max-width: 639px)').matches;
+      if (!isMobile || !anchor) {
+        setStyle(null);
+        return;
+      }
+      const rect = anchor.getBoundingClientRect();
+      setStyle({ position: 'fixed', top: rect.bottom + 8, left: 16, right: 16 });
+    }
+
+    update();
+    window.addEventListener('resize', update);
+    window.addEventListener('scroll', update, true);
+    return () => {
+      window.removeEventListener('resize', update);
+      window.removeEventListener('scroll', update, true);
+    };
+  }, [open, anchorRef]);
+
+  return style;
 }
 
 /* ------------------------------------------------------------------ Button */

@@ -112,7 +112,7 @@ describe('atualização semanal com extratos sobrepostos', () => {
   });
 
   it('modo Adicionar preserva lançamentos manuais e de outras contas', async () => {
-    const carteira = (await db.accounts.list()).find((a) => a.name === 'Carteira')!;
+    const itau = (await db.accounts.list()).find((a) => a.name === 'Itaú')!;
 
     await db.transactions.create({
       type: 'expense',
@@ -120,7 +120,7 @@ describe('atualização semanal com extratos sobrepostos', () => {
       description: 'Pão na padaria (dinheiro)',
       date: '2026-08-06',
       categoryId: categories[0]!.id,
-      accountId: carteira.id,
+      accountId: itau.id,
       notes: null,
       source: 'manual',
       sourceRecurrenceId: null,
@@ -130,20 +130,20 @@ describe('atualização semanal com extratos sobrepostos', () => {
     await importarAdicionando(SEMANA_1);
     await importarAdicionando(SEMANA_2);
 
-    const manuais = (await db.transactions.list()).filter((t) => t.accountId === carteira.id);
+    const manuais = (await db.transactions.list()).filter((t) => t.accountId === itau.id);
     expect(manuais).toHaveLength(1);
     expect(await db.transactions.list()).toHaveLength(6);
   });
 
   it('modo Substituir APAGA os lançamentos manuais e de outras contas', async () => {
-    const carteira = (await db.accounts.list()).find((a) => a.name === 'Carteira')!;
+    const itau = (await db.accounts.list()).find((a) => a.name === 'Itaú')!;
     await db.transactions.create({
       type: 'expense',
       amountCents: 2000,
       description: 'Pão na padaria (dinheiro)',
       date: '2026-08-06',
       categoryId: categories[0]!.id,
-      accountId: carteira.id,
+      accountId: itau.id,
       notes: null,
       source: 'manual',
       sourceRecurrenceId: null,
@@ -164,7 +164,7 @@ describe('atualização semanal com extratos sobrepostos', () => {
     await importarSubstituindo(SEMANA_2);
 
     expect(await db.categories.list()).toHaveLength(9);
-    expect(await db.accounts.list()).toHaveLength(3);
+    expect(await db.accounts.list()).toHaveLength(2);
     expect(await db.budgets.list()).toHaveLength(1);
   });
 

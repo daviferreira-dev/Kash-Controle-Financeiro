@@ -16,3 +16,17 @@
   width: 0;
   height: 0;
 }
+
+/**
+ * Números financeiros: sempre em grotesca, nunca na serifada de destaque
+ * (`font-display`, usada nos títulos). A Playfair Display tem algarismos
+ * elegantes para título, mas difíceis de comparar rápido num extrato — o
+ * `.tabular` é aplicado em todo valor monetário e data numérica do app, então
+ * sobrescrever a fonte aqui resolve a legibilidade em um único lugar, na tela
+ * inteira e sem mexer em cada componente. Precisa vir depois de
+ * `@tailwind utilities` para vencer a classe `font-display` na cascata.
+ */
+.tabular {
+  font-variant-numeric: tabular-nums;
+  font-family: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+}

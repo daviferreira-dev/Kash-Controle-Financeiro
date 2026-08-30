@@ -28,14 +28,14 @@ beforeEach(() => {
 });
 
 describe('seedIfEmpty (FR-026)', () => {
-  it('cria as 9 categorias e as 3 contas padrão', async () => {
+  it('cria as 9 categorias e as 2 contas padrão', async () => {
     await db.seedIfEmpty();
 
     const categories = await db.categories.list();
     const accounts = await db.accounts.list();
 
     expect(categories).toHaveLength(9);
-    expect(accounts).toHaveLength(3);
+    expect(accounts).toHaveLength(2);
     expect(categories.map((c) => c.name)).toEqual([
       'Alimentação',
       'Transporte',
@@ -47,7 +47,7 @@ describe('seedIfEmpty (FR-026)', () => {
       'Assinaturas',
       'Outros',
     ]);
-    expect(accounts.map((a) => a.name)).toEqual(['Nubank', 'Itaú', 'Carteira']);
+    expect(accounts.map((a) => a.name)).toEqual(['Nubank', 'Itaú']);
   });
 
   it('é idempotente: rodar de novo não duplica nada', async () => {
@@ -56,7 +56,7 @@ describe('seedIfEmpty (FR-026)', () => {
     await db.seedIfEmpty();
 
     expect(await db.categories.list()).toHaveLength(9);
-    expect(await db.accounts.list()).toHaveLength(3);
+    expect(await db.accounts.list()).toHaveLength(2);
   });
 
   it('não duplica quando chamado em paralelo (StrictMode)', async () => {
@@ -68,10 +68,10 @@ describe('seedIfEmpty (FR-026)', () => {
     const accounts = await db.accounts.list();
 
     expect(categories).toHaveLength(9);
-    expect(accounts).toHaveLength(3);
+    expect(accounts).toHaveLength(2);
     // E cada nome aparece uma única vez.
     expect(new Set(categories.map((c) => c.name)).size).toBe(9);
-    expect(new Set(accounts.map((a) => a.name)).size).toBe(3);
+    expect(new Set(accounts.map((a) => a.name)).size).toBe(2);
   });
 
   it('não duplica quando duas instâncias semeiam em paralelo (duas abas)', async () => {

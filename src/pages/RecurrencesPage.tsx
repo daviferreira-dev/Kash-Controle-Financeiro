@@ -23,6 +23,7 @@ import {
   Select,
   Textarea,
   cx,
+  useToast,
 } from '@/components/ui';
 
 const FREQUENCY_LABELS: Record<RecurrenceFrequency, string> = {
@@ -217,6 +218,7 @@ export function RecurrencesPage() {
   const { categories, accounts } = useKash();
   const { recurrences, create, update, remove, setStatus } = useRecurrences();
   const money = useMoney();
+  const { notify } = useToast();
 
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Recurrence | null>(null);
@@ -225,8 +227,10 @@ export function RecurrencesPage() {
   async function handleSubmit(input: NewRecurrence) {
     if (editing) {
       await update(editing.id, input);
+      notify(`"${input.description}" atualizada.`);
     } else {
       await create(input);
+      notify(`"${input.description}" criada. O Kash lança automaticamente a partir de agora.`);
     }
     setFormOpen(false);
     setEditing(null);

@@ -3,7 +3,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import type { IsoMonth } from '@/domain/types';
 import { addMonths, currentMonth, formatMonthLabel, monthOf } from '@/lib/date';
 import { useKash } from '@/state/hooks';
-import { cx } from '@/components/ui';
+import { cx, useMobilePopoverPosition } from '@/components/ui';
 
 const MESES = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
@@ -32,6 +32,8 @@ export function MonthSwitcher() {
   const [open, setOpen] = useState(false);
   const [visibleYear, setVisibleYear] = useState(() => Number(month.slice(0, 4)));
   const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const mobileStyle = useMobilePopoverPosition(open, triggerRef);
   const reduceMotion = useReducedMotion();
 
   const hoje = currentMonth();
@@ -105,6 +107,7 @@ export function MonthSwitcher() {
       </button>
 
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
@@ -145,11 +148,17 @@ export function MonthSwitcher() {
           <motion.div
             role="dialog"
             aria-label="Escolher período"
+            style={mobileStyle ?? undefined}
             initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -8, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -8, scale: 0.98 }}
             transition={{ duration: 0.18, ease: [0.2, 0.8, 0.2, 1] }}
-            className="absolute left-1/2 top-full z-50 mt-2 w-[min(22rem,calc(100vw-2.5rem))] -translate-x-1/2 rounded-lg border border-outline-variant bg-surface-container-lowest p-4 shadow-ambient"
+            className={cx(
+              'z-50 rounded-lg border border-outline-variant bg-surface-container-lowest p-4 shadow-ambient',
+              mobileStyle
+                ? 'w-auto'
+                : 'absolute left-1/2 top-full mt-2 w-[22rem] -translate-x-1/2',
+            )}
           >
             {/* Atalhos: o caminho curto para os períodos mais pedidos */}
             <div className="flex flex-wrap gap-1.5">

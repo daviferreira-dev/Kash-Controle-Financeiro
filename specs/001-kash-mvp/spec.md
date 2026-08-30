@@ -141,7 +141,7 @@ Como pessoa com contas fixas (aluguel, assinaturas, salário), eu cadastro uma r
 
 **Categorias, contas e dados**
 
-- **FR-026**: O sistema MUST oferecer as categorias iniciais Alimentação, Transporte, Moradia, Lazer, Saúde, Educação, Assinaturas e Outros, e as contas iniciais Nubank, Itaú e Carteira.
+- **FR-026**: O sistema MUST oferecer as categorias iniciais Alimentação, Transporte, Moradia, Lazer, Saúde, Educação, Assinaturas e Outros, e as contas iniciais Nubank e Itaú. (A conta "Carteira" foi removida do seed: dinheiro em espécie não entra no fluxo de importação de extrato CSV, que é o caminho principal de uso.)
 - **FR-027**: Usuários MUST conseguir criar, renomear e arquivar categorias e contas, preservando o histórico dos lançamentos já vinculados a elas.
 - **FR-028**: O sistema MUST persistir todos os dados localmente no navegador, mantendo-os disponíveis entre sessões sem exigir cadastro ou login.
 - **FR-029**: O sistema MUST avisar de forma visível quando não for possível gravar os dados localmente (armazenamento indisponível ou esgotado).

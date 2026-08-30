@@ -22,5 +22,4 @@ export const DEFAULT_CATEGORIES: NewCategory[] = [
 export const DEFAULT_ACCOUNTS: NewAccount[] = [
   { name: 'Nubank', initialBalanceCents: 0, archived: false, isDefault: true },
   { name: 'Itaú', initialBalanceCents: 0, archived: false, isDefault: true },
-  { name: 'Carteira', initialBalanceCents: 0, archived: false, isDefault: true },
 ];
